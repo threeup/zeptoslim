@@ -3,11 +3,11 @@ namespace zeptolib
     public class Tile : IRenderable
     {
 
-        public char c;
+        public string c;
         public Vec3 position;
         
-        public char GetChar() { return c; }
-        public Tile(char p_c) {
+        public string GetChar() { return c; }
+        public Tile(string p_c) {
             c = p_c;
         }
     }

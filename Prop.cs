@@ -2,9 +2,9 @@ namespace zeptolib
 {
     public class Prop : IRenderable
     {
-        public char c = 'P';
+        public string c = Consts.DOUBLE_DAGGER;
         public Vec3 position = Vec3.Zero;
         
-        public char GetChar() { return c; }
+        public string GetChar() { return c; }
     }
 }

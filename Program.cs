@@ -11,6 +11,7 @@ namespace zeptolib
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             world = new World();
             world.Generate(10, 10);
@@ -28,7 +29,7 @@ namespace zeptolib
             while (val.Key != ConsoleKey.Escape)
             {
                 Console.Clear();
-                Renderer.Draw(world, human, camX, camY);
+                ConsoleRenderer.Draw(world, human, camX, camY);
                 val = Console.ReadKey();
                 inputKey = null;
                 switch (val.Key)

@@ -4,9 +4,9 @@ namespace zeptolib
     {
         public bool controlled = false;
         public Vec3 position = Vec3.Zero;
-        public char c ='P';
+        public string c = Consts.POINTY_CIRCLE;
 
-        public char GetChar() { return c; }
+        public string GetChar() { return c; }
 
         public void Tick()
         {

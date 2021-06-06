@@ -21,7 +21,7 @@ namespace zeptolib
             {
                 for (int x = 0; x < l; ++x)
                 {
-                    AddTile(x, y, 0, '_');
+                    AddTile(x, y, 0, Consts.MIDDLE_DOT);
                 }
             }
         }
@@ -39,7 +39,7 @@ namespace zeptolib
             return x * w + y;
         }
 
-        public void AddTile(int x, int y, int z, char c)
+        public void AddTile(int x, int y, int z, string c)
         {
             int idx = ToIdx(x, y);
             Tile t = new Tile(c);

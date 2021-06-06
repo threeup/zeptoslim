@@ -3,7 +3,7 @@ using System.Text;
 
 namespace zeptolib
 {
-    public class Renderer
+    public class ConsoleRenderer
     {
         public static int radius = 4;
         public static void Draw(World w, Human h, int x, int y)
@@ -36,7 +36,7 @@ namespace zeptolib
                     }
                     else
                     {
-                        line.Append('~');
+                        line.Append(Consts.ALMOST_EQUAL);
                     }
                 }
                 if(row >=2 && row <= 6)
