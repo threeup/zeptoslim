@@ -19,6 +19,7 @@ namespace zeptolib
             world = new World();
             world.Generate(10, 10);
             human = new Human();
+            human.Setup();
             Hero hero = new Hero();
             human.Possess(hero);
             world.AddPawn(hero);
@@ -61,6 +62,7 @@ namespace zeptolib
                 {
                     human.Move(moveX, moveY);
                     human.Tick();
+                    world.MovePawn(human.pawn);
                     camX = human.pawn.position.X;
                     camY = human.pawn.position.Y;
                 }

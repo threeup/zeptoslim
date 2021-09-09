@@ -13,7 +13,6 @@ namespace zeptolib
             this.moveY = moveY;
         }
 
-
         public override void Tick()
         {
             if (pawn == null)
@@ -22,8 +21,9 @@ namespace zeptolib
             }
             if(moveX != 0 || moveY != 0)
             {
-                pawn.position += moveX*Vec3.Forward;
-                pawn.position += moveY*Vec3.Left;
+                pawn.Move(moveX, moveY);
+                moveX = 0;
+                moveY = 0;
                 if(cards.Count > 0)
                 {
                     Card card = cards[0] as Card;
@@ -32,8 +32,6 @@ namespace zeptolib
                         cards.RemoveAt(0);
                     }
                 }
-                moveX = 0;
-                moveY = 0;
             }
         }
 

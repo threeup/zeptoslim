@@ -114,5 +114,22 @@ namespace zeptolib
             return null;
         }
 
+        
+        public void MovePawn(Pawn obj)
+        {
+            if(pawnmap.ContainsKey(obj.position))
+            {
+                obj.CollidePawn(pawnmap[obj.position]);
+                return;
+            }
+            pawnmap.Remove(obj.lastPosition);
+            pawnmap.Add(obj.position, obj);
+            if(propmap.ContainsKey(obj.position))
+            {
+                obj.CollideProp(propmap[obj.position]);
+            }
+        }
+
+        
     }
 }
