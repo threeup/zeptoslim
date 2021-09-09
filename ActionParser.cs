@@ -1,15 +1,19 @@
+using System;
 namespace zeptolib
 {
     public static class ActionParser
     {
         private static string IncrementString = "+=";
+        private static string[] IncrementStringSep = new string[] { IncrementString };
         private static string DecrementString = "-=";
+        private static string[] DecrementStringSep = new string[] { DecrementString };
         private static string AssignmentString = "=";
+        private static string[] AssignmentStringSep = new string[] { AssignmentString };
         public static Action MakeAction(string line)
         {
             Action action = new Action();
             action.Setup();
-            if(line.Contains(','))
+            if(line.Contains(","))
             {
                 string[] chunks = line.Split(',');
                 
@@ -24,21 +28,21 @@ namespace zeptolib
 
                 if (line.Contains(IncrementString))
                 {
-                    string[] chunks = line.Split(IncrementString);
+                    String[] chunks = line.Split(IncrementStringSep, StringSplitOptions.None);
                     ZeptoVar var = StringToVar(chunks[0]);
                     int val = int.Parse(chunks[1]);
                     action.SetVarChanger(var, ZeptoOp.INCREMENT, val);
                 }
                 if (line.Contains(DecrementString))
                 {
-                    string[] chunks = line.Split(DecrementString);
+                    string[] chunks = line.Split(DecrementStringSep, StringSplitOptions.None);
                     ZeptoVar var = StringToVar(chunks[0]);
                     int val = int.Parse(chunks[1]);
                     action.SetVarChanger(var, ZeptoOp.DECREMENT, val);
                 }
                 if (line.Contains(AssignmentString))
                 {
-                    string[] chunks = line.Split(AssignmentString);
+                    string[] chunks = line.Split(AssignmentStringSep, StringSplitOptions.None);
                     ZeptoVar var = StringToVar(chunks[0]);
                     int val = int.Parse(chunks[1]);
                     action.SetVarChanger(var, ZeptoOp.ASSIGN, val);

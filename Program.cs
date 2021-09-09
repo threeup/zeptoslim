@@ -15,7 +15,7 @@ namespace zeptolib
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             cardManager = new CardManager();
-            cardManager.Populate();
+            cardManager.Populate("actions.csv");
             world = new World();
             world.Generate(10, 10);
             human = new Human();

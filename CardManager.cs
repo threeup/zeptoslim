@@ -7,10 +7,15 @@ namespace zeptolib
     {
         public static CardManager Instance = null;
         public Queue<Card> Deck = new Queue<Card>();
-        public void Populate()
+        private string cardPath = null;
+        public void Populate(string path)
         {
+            if (path != null)
+            {
+                cardPath = path;
+            }
             Instance = this;
-            using(StreamReader file = new StreamReader("actions.csv")) {  
+            using(StreamReader file = new StreamReader(cardPath)) {  
                 string ln;  
                 
                 while ((ln = file.ReadLine()) != null) {  
@@ -30,7 +35,7 @@ namespace zeptolib
             {
                 if(Deck.Count == 0)
                 {
-                    Populate();
+                    Populate(null);
                 }
                 result[i] = Deck.Dequeue();
             }
