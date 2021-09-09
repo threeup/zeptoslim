@@ -43,5 +43,9 @@ namespace zeptolib
         {
             return new Vec3(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
         }
+        public static Vec3 operator*(int val, Vec3 rhs)
+        {
+            return new Vec3(val* rhs.X, val* rhs.Y, val* rhs.Z);
+        }
     }
 }

@@ -1,38 +1,57 @@
+using System.Collections.Generic;
+
 namespace zeptolib
 {
+
+    public enum Slot
+    {
+        One,
+        Two,
+        Three,
+        Four,
+        Five,
+        Cycle,
+    }
+
+    public enum ZeptoVar
+    {
+        NONE,
+        HP,
+        NRG,
+        SPD
+    }
+    public enum ZeptoOp
+    {
+        NONE,
+        INCREMENT,
+        DECREMENT,
+        ASSIGN,
+    }
     public class Action
     {
-        public enum Slot
+        public List<Action> subActions = new List<Action>();
+        private ZeptoVar var;
+        private ZeptoOp op;
+        private int val;
+
+        public void Setup()
         {
-            One,
-            Two,
-            Three,
-            Four,
-            Five,
-            Cycle,
+            subActions.Clear();
         }
-        
-        public static bool PawnForward(Pawn pawn)
+        public void AddSubAction(Action next)
         {
-            pawn.position += Vec3.Forward;
-            return true;
+            subActions.Add(next);
         }
-        
-        public static bool PawnBackward(Pawn pawn)
+
+        public void SetVarChanger(ZeptoVar var, ZeptoOp op, int val)
         {
-            pawn.position -= Vec3.Forward;
-            return true;
+            this.var = var;
+            this.op = op;
+            this.val = val;
         }
-        
-        public static bool PawnLeft(Pawn pawn)
+
+        public bool PawnPerform(Pawn obj)
         {
-            pawn.position += Vec3.Left;
-            return true;
-        }
-        
-        public static bool PawnRight(Pawn pawn)
-        {
-            pawn.position -= Vec3.Left;
             return true;
         }
     }

@@ -1,43 +1,41 @@
- 
+using System.Collections.Generic;
+using System.IO;
+
 namespace zeptolib
 {
     public class CardManager
     {
-        public static Card[] Grab(int count)
+        public static CardManager Instance = null;
+        public Queue<Card> Deck = new Queue<Card>();
+        public void Populate()
+        {
+            Instance = this;
+            using(StreamReader file = new StreamReader("actions.csv")) {  
+                string ln;  
+                
+                while ((ln = file.ReadLine()) != null) {  
+                    Action action = ActionParser.MakeAction(ln);
+                    Card card = new Card(ln, action, 1);
+                    Deck.Enqueue(card);
+                }  
+                file.Close();  
+            } 
+        }
+
+        public Card[] Grab(int count)
         {
             Card[] result = new Card[count];
+            
             for(int i=0; i<count; ++i)
             {
-                if(i<2)
+                if(Deck.Count == 0)
                 {
-                    result[i] = GrabBackward();
+                    Populate();
                 }
-                else
-                {
-                    result[i] = GrabForward();
-                }
+                result[i] = Deck.Dequeue();
             }
             return result;
         }
 
-        public static Card GrabForward()
-        {
-            return new Card("F,Forward", Action.PawnForward);
-        }
-        
-        public static Card GrabBackward()
-        {
-            return new Card("B,Backward", Action.PawnBackward);
-        }
-        
-        public static Card GrabLeft()
-        {
-            return new Card("L,Left", Action.PawnLeft);
-        }
-        
-        public static Card GrabRight()
-        {
-            return new Card("R,Right", Action.PawnRight);
-        }
     }
 }

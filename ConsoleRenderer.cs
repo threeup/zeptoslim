@@ -42,10 +42,10 @@ namespace zeptolib
                 if(row >=2 && row <= 6)
                 {
                     int itx = row-2;
-                    if(h.items.Count > itx)
+                    if(h.cards.Count > itx)
                     {
                         line.Append("  ["+(itx+1)+"] ");
-                        line.Append(h.items[itx].Name);
+                        line.Append(h.cards[itx].Name);
                     }
                 }
                 Console.WriteLine(line);

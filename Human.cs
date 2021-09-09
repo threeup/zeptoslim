@@ -2,12 +2,17 @@ namespace zeptolib
 {
     public class Human : Controller
     {
-        Action.Slot? currentSlot = null;
+        public int? direction = null;
 
-        public void DoAction(Action.Slot nextSlot)
+        private int moveX = 0;
+        private int moveY = 0;
+
+        public void Move(int moveX, int moveY)
         {
-            currentSlot = nextSlot;
+            this.moveX = moveX;
+            this.moveY = moveY;
         }
+
 
         public override void Tick()
         {
@@ -15,34 +20,22 @@ namespace zeptolib
             {
                 return;
             }
-            switch (currentSlot)
+            if(moveX != 0 || moveY != 0)
             {
-                case Action.Slot.One: TryCard(0); break;
-                case Action.Slot.Two: TryCard(1); break;
-                case Action.Slot.Three: TryCard(2); break;
-                case Action.Slot.Four: TryCard(3); break;
-                case Action.Slot.Five: TryCard(4); break;
-                case Action.Slot.Cycle:
-                    items.Clear();
-                    items.AddRange(CardManager.Grab(5));
-                    break;
-
-            }
-            currentSlot = null;
-        }
-
-        void TryCard(int idx)
-        {
-            if (items.Count <= idx)
-            {
-                return;
-            }
-            Card card = items[idx] as Card;
-            card.Activate(pawn);
-            if (card.Count == 0)
-            {
-                items.RemoveAt(idx);
+                pawn.position += moveX*Vec3.Forward;
+                pawn.position += moveY*Vec3.Left;
+                if(cards.Count > 0)
+                {
+                    Card card = cards[0] as Card;
+                    card.Activate(pawn);
+                    if(card.Count <= 0) {
+                        cards.RemoveAt(0);
+                    }
+                }
+                moveX = 0;
+                moveY = 0;
             }
         }
+
     }
 }

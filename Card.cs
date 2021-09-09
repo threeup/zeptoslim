@@ -1,20 +1,20 @@
 namespace zeptolib
 {
-    public class Card : Item
+    public class Card : Resource
     {
         public delegate bool CardPawnAction(Pawn obj);
 
-        public CardPawnAction performAction = null;
+        public Action action = null;
 
-        public Card(string p_name, CardPawnAction p_action, int p_count = 1 ) :
-            base(p_name, p_count)
+        public Card(string name, Action action, int count = 1 ) :
+            base(name, count)
         {
-            performAction = p_action;
+            this.action = action;
         }
 
         public void Activate(Pawn obj)
         {
-            if (performAction(obj))
+            if (action.PawnPerform(obj))
             {
                 Count--;
             }
