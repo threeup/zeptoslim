@@ -5,8 +5,9 @@ namespace zeptolib
     public class Controller
     {
         public Pawn pawn;
-        public List<Resource> resources = new List<Resource>();
         public List<Card> cards = new List<Card>();
+        
+        private System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
         public void Possess(Pawn p_pawn) {
             if(pawn != null) {
@@ -61,6 +62,19 @@ namespace zeptolib
                 
                 pawn.Tick();
             }
+        }
+
+        public string GetAttributesString()
+        {
+            sb.Clear();
+            foreach(KeyValuePair<string, int> kvp in pawn.attributes)
+            {
+                sb.Append(kvp.Key);
+                sb.Append(":");
+                sb.Append(kvp.Value);
+                sb.Append(", ");
+            }
+            return sb.ToString();
         }
     }
 }

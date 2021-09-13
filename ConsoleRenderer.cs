@@ -9,8 +9,9 @@ namespace zeptolib
         public static void Draw(World w, Human h, int x, int y)
         {
             int row=0;
-            
-            Console.WriteLine("Hero, the hero: X" + x + " Y" + y);
+
+            string humanAttributes = h.GetAttributesString();
+            Console.WriteLine("Hero, the hero: "+humanAttributes);
             row++;
 
             for(int yy=y+radius; yy>=y-radius; --yy)

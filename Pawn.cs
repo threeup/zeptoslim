@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+
 namespace zeptolib
 {
     public class Pawn : IRenderable
     {
+
+        public Dictionary<string, int> attributes = new Dictionary<string, int>();
         public bool controlled = false;
         public Vec3 lastPosition = Vec3.Zero;
         public Vec3 position = Vec3.Zero;
@@ -9,16 +13,47 @@ namespace zeptolib
 
         public string GetChar() { return c; }
 
-        public void Tick()
+        public void Setup()
         {
-            
+            attributes.Add(Attribs.X, 1);
+            attributes.Add(Attribs.Y, 1);
+            attributes.Add(Attribs.HP, 10);
         }
 
-        public void Move(int moveX, int moveY)
+        public void Tick()
+        {
+
+        }
+
+        public void SetAttrib(string key, int amount)
+        {
+            if (attributes.ContainsKey(key))
+            {
+                attributes[key] = amount;
+            }
+            else
+            {
+                attributes.Add(key, amount);
+            }
+        }
+
+        public void ModifyAttrib(string key, int amount)
+        {
+            if (attributes.ContainsKey(key))
+            {
+                attributes[key] += amount;
+            }
+            else
+            {
+                attributes.Add(key, amount);
+            }
+        }
+
+        public void Move()
         {
             lastPosition = position;
-            position.MoveX(moveX);
-            position.MoveY(moveY);
+            position.SetX(attributes[Attribs.X]);
+            position.SetY(attributes[Attribs.Y]);
         }
 
         public void CollidePawn(Pawn other)

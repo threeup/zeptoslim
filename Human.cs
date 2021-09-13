@@ -2,15 +2,16 @@ namespace zeptolib
 {
     public class Human : Controller
     {
-        public int? direction = null;
+    
 
-        private int moveX = 0;
-        private int moveY = 0;
+        private bool dirtyMove = false;
 
         public void Move(int moveX, int moveY)
         {
-            this.moveX = moveX;
-            this.moveY = moveY;
+            
+            pawn.ModifyAttrib(Attribs.X, moveX);
+            pawn.ModifyAttrib(Attribs.Y, moveY);
+            dirtyMove = true;
         }
 
         public override void Tick()
@@ -19,11 +20,9 @@ namespace zeptolib
             {
                 return;
             }
-            if(moveX != 0 || moveY != 0)
+            if(dirtyMove)
             {
-                pawn.Move(moveX, moveY);
-                moveX = 0;
-                moveY = 0;
+                dirtyMove = false;
                 if(cards.Count > 0)
                 {
                     Card card = cards[0] as Card;
@@ -32,6 +31,7 @@ namespace zeptolib
                         cards.RemoveAt(0);
                     }
                 }
+                pawn.Move();
             }
         }
 

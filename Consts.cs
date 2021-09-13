@@ -1,5 +1,12 @@
 namespace zeptolib
 {
+    public class Attribs
+    {
+        
+        public static string X = "XPOS";
+        public static string Y = "YPOS";
+        public static string HP = "HP";
+    }
     public class Consts
     {
         public static string ALL = " ∞∆◊ӿ†‡≈҈҉ѺѦΞΣΦΨψ˚º°«»·¬¤|¦∫¥№ғªⁿ²³κο×ŦҨ–—¯_‗";

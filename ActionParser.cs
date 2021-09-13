@@ -29,44 +29,44 @@ namespace zeptolib
                 if (line.Contains(IncrementString))
                 {
                     String[] chunks = line.Split(IncrementStringSep, StringSplitOptions.None);
-                    ZeptoVar var = StringToVar(chunks[0]);
+                    string attrib = StringToAttrib(chunks[0]);
                     int val = int.Parse(chunks[1]);
-                    action.SetVarChanger(var, ZeptoOp.INCREMENT, val);
+                    action.SetAttribChanger(attrib, ZeptoOp.INCREMENT, val);
                 }
-                if (line.Contains(DecrementString))
+                else if (line.Contains(DecrementString))
                 {
                     string[] chunks = line.Split(DecrementStringSep, StringSplitOptions.None);
-                    ZeptoVar var = StringToVar(chunks[0]);
+                    string attrib = StringToAttrib(chunks[0]);
                     int val = int.Parse(chunks[1]);
-                    action.SetVarChanger(var, ZeptoOp.DECREMENT, val);
+                    action.SetAttribChanger(attrib, ZeptoOp.DECREMENT, val);
                 }
-                if (line.Contains(AssignmentString))
+                else if (line.Contains(AssignmentString))
                 {
                     string[] chunks = line.Split(AssignmentStringSep, StringSplitOptions.None);
-                    ZeptoVar var = StringToVar(chunks[0]);
+                    string attrib = StringToAttrib(chunks[0]);
                     int val = int.Parse(chunks[1]);
-                    action.SetVarChanger(var, ZeptoOp.ASSIGN, val);
+                    action.SetAttribChanger(attrib, ZeptoOp.ASSIGN, val);
                 }
 
                 return action;
             }
         }
 
-        private static ZeptoVar StringToVar(string val)
+        private static string StringToAttrib(string val)
         {
+            if(val == "X")
+            {
+                return Attribs.X;
+            }
+            if(val == "Y")
+            {
+                return Attribs.Y;
+            }
             if(val == "HP")
             {
-                return ZeptoVar.HP;
+                return Attribs.HP;
             }
-            if(val == "NRG")
-            {
-                return ZeptoVar.NRG;
-            }
-            if(val == "SPD")
-            {
-                return ZeptoVar.SPD;
-            }
-            return ZeptoVar.NONE;
+            return val;
         }
     }
 }

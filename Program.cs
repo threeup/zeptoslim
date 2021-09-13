@@ -21,6 +21,7 @@ namespace zeptolib
             human = new Human();
             human.Setup();
             Hero hero = new Hero();
+            hero.Setup();
             human.Possess(hero);
             world.AddPawn(hero);
             Prop prop = new Prop();
@@ -29,19 +30,20 @@ namespace zeptolib
             ConsoleKeyInfo val = default(ConsoleKeyInfo);
             int camX = 0;
             int camY = 0;
-            int moveX = 0;
-            int moveY = 0;
+            int? moveX = 0;
+            int? moveY = 0;
             Slot? slotKey = null;
             while (val.Key != ConsoleKey.Escape)
             {
                 Console.Clear();
                 ConsoleRenderer.Draw(world, human, camX, camY);
                 val = Console.ReadKey();
-                moveX = 0;
-                moveY = 0;
+                moveX = null;
+                moveY = null;
                 slotKey = null;
                 switch (val.Key)
                 {
+                    case ConsoleKey.Spacebar: moveX = 0; moveY = 0; break;
                     case ConsoleKey.UpArrow: moveY = 1; break;
                     case ConsoleKey.DownArrow: moveY = -1; break;
                     case ConsoleKey.LeftArrow: moveX = -1; break;
@@ -58,9 +60,9 @@ namespace zeptolib
                 {
                     human.SelectSlot(slotKey.Value);
                 }
-                else if(moveX != 0 || moveY != 0)
+                else if(moveX.HasValue || moveY.HasValue)
                 {
-                    human.Move(moveX, moveY);
+                    human.Move(moveX ?? 0, moveY ?? 0);
                     human.Tick();
                     world.MovePawn(human.pawn);
                     camX = human.pawn.position.X;
