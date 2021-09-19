@@ -29,21 +29,21 @@ namespace zeptolib
                 if (line.Contains(IncrementString))
                 {
                     String[] chunks = line.Split(IncrementStringSep, StringSplitOptions.None);
-                    string attrib = StringToAttrib(chunks[0]);
+                    string attrib = RuleLib.StringToAttrib(chunks[0]);
                     int val = int.Parse(chunks[1]);
                     action.SetAttribChanger(attrib, ZeptoOp.INCREMENT, val);
                 }
                 else if (line.Contains(DecrementString))
                 {
                     string[] chunks = line.Split(DecrementStringSep, StringSplitOptions.None);
-                    string attrib = StringToAttrib(chunks[0]);
+                    string attrib = RuleLib.StringToAttrib(chunks[0]);
                     int val = int.Parse(chunks[1]);
                     action.SetAttribChanger(attrib, ZeptoOp.DECREMENT, val);
                 }
                 else if (line.Contains(AssignmentString))
                 {
                     string[] chunks = line.Split(AssignmentStringSep, StringSplitOptions.None);
-                    string attrib = StringToAttrib(chunks[0]);
+                    string attrib = RuleLib.StringToAttrib(chunks[0]);
                     int val = int.Parse(chunks[1]);
                     action.SetAttribChanger(attrib, ZeptoOp.ASSIGN, val);
                 }
@@ -52,21 +52,5 @@ namespace zeptolib
             }
         }
 
-        private static string StringToAttrib(string val)
-        {
-            if(val == "X")
-            {
-                return Attribs.X;
-            }
-            if(val == "Y")
-            {
-                return Attribs.Y;
-            }
-            if(val == "HP")
-            {
-                return Attribs.HP;
-            }
-            return val;
-        }
     }
 }

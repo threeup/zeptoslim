@@ -11,18 +11,29 @@ namespace zeptolib
         public Vec3 position = Vec3.Zero;
         public string c = Consts.POINTY_CIRCLE;
 
+        public List<Action> tileActions;
+        public List<Condition> endConditions;
+
         public string GetChar() { return c; }
 
-        public void Setup()
+        public void Setup(string startFile, string tileFile, string endFile)
         {
-            attributes.Add(Attribs.X, 1);
-            attributes.Add(Attribs.Y, 1);
-            attributes.Add(Attribs.HP, 10);
+            RuleLib.LoadStart(this, startFile);
+            RuleLib.LoadTile(this, tileFile);
+            RuleLib.LoadEnd(this, endFile);
         }
 
         public void Tick()
         {
 
+        }
+        public int GetAttrib(string key)
+        {
+            if (attributes.ContainsKey(key))
+            {
+                return attributes[key];
+            }
+            return 0;
         }
 
         public void SetAttrib(string key, int amount)

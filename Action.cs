@@ -2,17 +2,6 @@ using System.Collections.Generic;
 
 namespace zeptolib
 {
-
-    public enum Slot
-    {
-        One,
-        Two,
-        Three,
-        Four,
-        Five,
-        Cycle,
-    }
-
     public enum ZeptoOp
     {
         NONE,

@@ -21,7 +21,7 @@ namespace zeptolib
             human = new Human();
             human.Setup();
             Hero hero = new Hero();
-            hero.Setup();
+            hero.Setup("StartRules.csv","TileRules.csv","EndRules.csv");
             human.Possess(hero);
             world.AddPawn(hero);
             Prop prop = new Prop();
