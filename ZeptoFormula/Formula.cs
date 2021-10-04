@@ -8,9 +8,9 @@ namespace ZeptoFormula
         public bool isConstFormula;
         public List<int> bindings;
 
-        private List<Element> rpnFormula = new List<Element>();
+        private List<FormulaElement> rpnFormula = new List<FormulaElement>();
 
-        Stack<Element> stackBuffer = new Stack<Element>();
+        Stack<FormulaElement> stackBuffer = new Stack<FormulaElement>();
 
 
         public Formula()
@@ -18,7 +18,7 @@ namespace ZeptoFormula
             isConstFormula = true;
         }
 
-        public void AddElementList(List<Element> elements)
+        public void AddElementList(List<FormulaElement> elements)
         {
             stackBuffer.Clear();
             rpnFormula.Clear();
@@ -57,8 +57,8 @@ namespace ZeptoFormula
             int elementCount = 0;
             for (int i = 0; i < rpnFormula.Count; ++i)
             {
-                ElementType token = rpnFormula[i].elementType;
-                if (token == ElementType.LB || token == ElementType.RB)
+                FormulaElementType token = rpnFormula[i].elementType;
+                if (token == FormulaElementType.LB || token == FormulaElementType.RB)
                 {
                     //dontcare
                 }
@@ -83,52 +83,52 @@ namespace ZeptoFormula
             return shouldbeZero != 0;
         }
 
-        public static ElementType RegisterFromInt(int i)
+        public static FormulaElementType RegisterFromInt(int i)
         {
-            return (ElementType)(i + (int)ElementType.REG1);
+            return (FormulaElementType)(i + (int)FormulaElementType.REG1);
         }
 
-        public static int RegisterToInt(ElementType elementType)
+        public static int RegisterToInt(FormulaElementType elementType)
         {
-            return (int)elementType - (int)ElementType.REG1;
+            return (int)elementType - (int)FormulaElementType.REG1;
         }
 
 
-        public int Calculate(Context ctx)
+        private int GetVal(IFormulaContext ctx, FormulaElement el)
         {
-
-            return EvaluateRPN(ctx);
-        }
-
-        private int GetVal(Context ctx, Element el)
-        {
-            if(el.elementType == ElementType.CONST)
+            if (el.elementType == FormulaElementType.CONST)
             {
                 return el.val;
             }
-            return ctx.GetVariableValue(RegisterToInt(el.elementType));
+            int boundIndex = bindings[RegisterToInt(el.elementType)];
+            return ctx.GetVariableValue(boundIndex);
         }
 
 
         /// <summary>
         /// Method use to calculate the value of the formula.
         /// </summary>
-        private int EvaluateRPN(Context ctx)
+        public int Calculate(IFormulaContext ctx)
         {
+            if (rpnFormula.Count == 0)
+            {
+                return 0;
+            }
             stackBuffer.Clear();
-            Element element = Element.BlankElement;
+            FormulaElement element = FormulaElement.BlankElement;
             for (int i = 0; i < rpnFormula.Count; ++i)
             {
                 element = rpnFormula[i];
-                ElementType elementType = element.elementType;
+                FormulaElementType elementType = element.elementType;
                 if (RPN.IsAssignType(elementType))
                 {
                     if (stackBuffer.Count >= 2)
                     {
-                        Element elOne = stackBuffer.Pop();
-                        Element elTwo = stackBuffer.Pop();
-                        int result = ctx.DoAssign(elementType, RegisterToInt(elTwo.elementType), elOne.val);
-                        stackBuffer.Push(new Element(result));
+                        FormulaElement elOne = stackBuffer.Pop();
+                        FormulaElement elTwo = stackBuffer.Pop();
+                        int boundIndex = bindings[RegisterToInt(elTwo.elementType)];
+                        int result = ctx.DoAssign(elementType, boundIndex, elOne.val);
+                        stackBuffer.Push(new FormulaElement(result));
                     }
                     else
                     {
@@ -139,13 +139,13 @@ namespace ZeptoFormula
                 {
                     if (stackBuffer.Count >= 2)
                     {
-                        
-                        Element elOne = stackBuffer.Pop();
-                        Element elTwo = stackBuffer.Pop();
+
+                        FormulaElement elOne = stackBuffer.Pop();
+                        FormulaElement elTwo = stackBuffer.Pop();
                         int valOne = GetVal(ctx, elOne);
                         int valTwo = GetVal(ctx, elTwo);
                         int result = RPN.DoOperation(valTwo, valOne, elementType);
-                        stackBuffer.Push(new Element(result));
+                        stackBuffer.Push(new FormulaElement(result));
                     }
                     else
                     {
@@ -154,34 +154,34 @@ namespace ZeptoFormula
                 }
                 else if (RPN.IsRegisterType(elementType))
                 {
-                    stackBuffer.Push(new Element(elementType));
+                    stackBuffer.Push(new FormulaElement(elementType));
                 }
                 else
                 {
-                    stackBuffer.Push(new Element(element.val));
+                    stackBuffer.Push(new FormulaElement(element.val));
                 }
             }
 
             if (stackBuffer.Count != 1)
                 throw new System.Exception("Cannot calculate formula." + stackBuffer.Count + " of " + rpnFormula.Count + " " + ToLongString(ctx));
 
-            Element last = stackBuffer.Pop();
+            FormulaElement last = stackBuffer.Pop();
             return last.val;
         }
 
 
 
-        public string ToLongString(Context ctx)
+        public string ToLongString(IFormulaContext ctx)
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder(isConstFormula ? "CONST: " : "RPN: ");
-            Element element = Element.BlankElement;
+            FormulaElement element = FormulaElement.BlankElement;
             for (int i = 0; i < rpnFormula.Count; ++i)
             {
                 element = rpnFormula[i];
                 sb.Append(element);
                 if (RPN.IsRegisterType(element.elementType))
                 {
-                    int val = ctx.GetVariableValue(RegisterToInt(element.elementType));
+                    int val = GetVal(ctx, element);
                     sb.Append('=');
                     sb.Append(val);
                 }

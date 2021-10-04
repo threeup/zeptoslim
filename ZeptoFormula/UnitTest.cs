@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using ZeptoCommon;
 
 namespace ZeptoFormula
 {
@@ -17,15 +18,16 @@ namespace ZeptoFormula
 
         public static void TestZero()
         {
-            Context ctx = new Context();
-            ctx.AddVariableName("HP");
-
-            string line = "4";
-            List<string> chunks = Parser.StringIntoChunks(line);
-            Formula f = Parser.ChunksIntoFormula(ctx, chunks);
-            //Console.WriteLine(f.ToLongString(ctx));
+            string varFileContents = "HP, , ";
+            string[] prepFileContents = new string[]{""};
+            string testLine = "4";
+            
+            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            List<string> buffer = new List<string>();
+            Parser.StringIntoChunks(testLine, ref buffer);
+            Formula f = FormulaFactory.Make(ctx, buffer);
             int val = f.Calculate(ctx);
-            //Console.WriteLine(ctx.ToLongString());
+            
             if(val != 4)
             {
                 throw new Exception("TestZero fail");
@@ -33,16 +35,16 @@ namespace ZeptoFormula
         }
         public static void TestOne()
         {
-            Context ctx = new Context();
-            ctx.AddVariableName("HP");
-            ctx.SetVariableValue("HP",5);
-            
-            string line = "HP+3";
-            List<string> chunks = Parser.StringIntoChunks(line);
-            Formula f = Parser.ChunksIntoFormula(ctx, chunks);
-            //Console.WriteLine(f.ToLongString(ctx));
+            string varFileContents = "HP";
+            string[] prepFileContents = new string[]{"HP=5"};
+            string testLine = "HP+3";
+
+            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            List<string> buffer = new List<string>();
+            Parser.StringIntoChunks(testLine, ref buffer);
+            Formula f = FormulaFactory.Make(ctx, buffer);
             int val = f.Calculate(ctx);
-            //Console.WriteLine(ctx.ToLongString());
+
             if(val != 8)
             {
                 throw new Exception("TestOne fail");
@@ -50,38 +52,36 @@ namespace ZeptoFormula
         }
         public static void TestTwo()
         {
-            Context ctx = new Context();
-            ctx.AddVariableName("HP");
-            ctx.AddVariableName("ENERGY");
-            ctx.SetVariableValue("HP",5);
-            ctx.SetVariableValue("ENERGY",2);
+            string varFileContents = "HP, ENERGY, ";
+            string[] prepFileContents = new string[]{"HP=5","ENERGY=2"};
+            string testLine = "HP += 3*ENERGY";
 
-            string line = "HP += 3*ENERGY";
-            List<string> chunks = Parser.StringIntoChunks(line);
-            Formula f = Parser.ChunksIntoFormula(ctx, chunks);
-            //Console.WriteLine(f.ToLongString(ctx));
+
+            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            List<string> buffer = new List<string>();
+            Parser.StringIntoChunks(testLine, ref buffer);
+            Formula f = FormulaFactory.Make(ctx, buffer);
             int val = f.Calculate(ctx);
-            //Console.WriteLine(ctx.ToLongString());
+            
             if(val != 11)
             {
-                throw new Exception("TestTwo fail");
+                throw new Exception("TestTwo fail"+val);
             }
 
         }
         public static void TestThree()
         {
-            Context ctx = new Context();
-            ctx.AddVariableName("HP");
-            ctx.AddVariableName("ENERGY");
-            ctx.SetVariableValue("HP",5);
-            ctx.SetVariableValue("ENERGY",2);
+            string varFileContents = "HP, ENERGY, ";
+            string[] prepFileContents = new string[]{"HP=15","ENERGY=2"};
+            string testLine = "HP = ENERGY+";
 
-            string line = "HP = ENERGY+";
-            List<string> chunks = Parser.StringIntoChunks(line);
+           
+            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            List<string> buffer = new List<string>();
+            Parser.StringIntoChunks(testLine, ref buffer);
             try
             {
-                Formula f = Parser.ChunksIntoFormula(ctx, chunks);
-                //Console.WriteLine(f.ToLongString(ctx));
+                Formula f = FormulaFactory.Make(ctx, buffer);
             }
             catch(Exception)
             {

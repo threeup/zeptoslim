@@ -5,26 +5,26 @@ namespace ZeptoFormula
     public static class RPN
     {
 
-        public static void InfixToRPN(List<Element> input, ref Stack<Element> stack, ref List<Element> outList, out bool isConstFormula)
+        public static void InfixToRPN(List<FormulaElement> input, ref Stack<FormulaElement> stack, ref List<FormulaElement> outList, out bool isConstFormula)
         {
             for (int i = 0; i < input.Count; i++)
             {
-                ElementType inputType = input[i].elementType;
-                if (HasPrecendence(inputType) || inputType == ElementType.LB || inputType == ElementType.RB)
+                FormulaElementType inputType = input[i].elementType;
+                if (HasPrecendence(inputType) || inputType == FormulaElementType.LB || inputType == FormulaElementType.RB)
                 {
-                    if (i != 0 && input[i - 1].elementType != ElementType.NONE)
-                        input.Insert(i, Element.BlankElement);
-                    if (i != input.Count - 1 && input[i + 1].elementType != ElementType.NONE)
-                        input.Insert(i + 1, Element.BlankElement);
+                    if (i != 0 && input[i - 1].elementType != FormulaElementType.NONE)
+                        input.Insert(i, FormulaElement.BlankElement);
+                    if (i != input.Count - 1 && input[i + 1].elementType != FormulaElementType.NONE)
+                        input.Insert(i + 1, FormulaElement.BlankElement);
                 }
             }
 
             isConstFormula = true;
             for (int i = 0; i < input.Count; ++i)
             {
-                Element element = input[i];
-                ElementType token = element.elementType;
-                if (token == ElementType.NONE)
+                FormulaElement element = input[i];
+                FormulaElementType token = element.elementType;
+                if (token == FormulaElementType.NONE)
                     continue;
 
                 if (HasPrecendence(token))
@@ -40,13 +40,13 @@ namespace ZeptoFormula
                     }
                     stack.Push(element);
                 }
-                else if (token == ElementType.LB)
+                else if (token == FormulaElementType.LB)
                 {
                     stack.Push(element);
                 }
-                else if (token == ElementType.RB)
+                else if (token == FormulaElementType.RB)
                 {
-                    while (stack.Count != 0 && stack.Peek().elementType != ElementType.LB)
+                    while (stack.Count != 0 && stack.Peek().elementType != FormulaElementType.LB)
                     {
                         outList.Add(stack.Pop());
                     }
@@ -67,31 +67,31 @@ namespace ZeptoFormula
 
         }
 
-        public static bool IsAssignType(ElementType elementType)
+        public static bool IsAssignType(FormulaElementType elementType)
         {
-            return elementType >= ElementType.SET && elementType <= ElementType.DECREMENT;
+            return elementType >= FormulaElementType.SET && elementType <= FormulaElementType.DECREMENT;
         }
-        public static bool IsOperatorType(ElementType elementType)
+        public static bool IsOperatorType(FormulaElementType elementType)
         {
-            return elementType >= ElementType.ADD && elementType <= ElementType.BITWISEEXCLUDEANY;
+            return elementType >= FormulaElementType.ADD && elementType <= FormulaElementType.BITWISEEXCLUDEANY;
         }
 
-        public static bool HasPrecendence(ElementType elementType)
+        public static bool HasPrecendence(FormulaElementType elementType)
         {
             return IsAssignType(elementType) || IsOperatorType(elementType);
         }
 
-        public static bool IsRegisterType(ElementType elementType)
+        public static bool IsRegisterType(FormulaElementType elementType)
         {
-            return elementType >= ElementType.REG1 && elementType <= ElementType.REG9;
+            return elementType >= FormulaElementType.REG1 && elementType <= FormulaElementType.REG9;
         }
 
-        public static bool RequiresBitWise(ElementType elementType)
+        public static bool RequiresBitWise(FormulaElementType elementType)
         {
-            return elementType >= ElementType.BITWISEMATCHALL && elementType <= ElementType.BITWISEEXCLUDEANY;
+            return elementType >= FormulaElementType.BITWISEMATCHALL && elementType <= FormulaElementType.BITWISEEXCLUDEANY;
         }
 
-        private static bool IsAssociative(ElementType token, int type)
+        private static bool IsAssociative(FormulaElementType token, int type)
         {
             if (!HasPrecendence(token))
                 throw new System.ArgumentException("Invalid token: " + token);
@@ -102,7 +102,7 @@ namespace ZeptoFormula
             return false;
         }
 
-        private static int ComparePrecedence(ElementType token1, ElementType token2)
+        private static int ComparePrecedence(FormulaElementType token1, FormulaElementType token2)
         {
             if (!HasPrecendence(token1) || !HasPrecendence(token2))
                 throw new System.ArgumentException("Invalid token: " + token1 + " " + token2);
@@ -110,7 +110,7 @@ namespace ZeptoFormula
             return RPNConsts.Precedence[token1][0] - RPNConsts.Precedence[token2][0];
         }
 
-        public static bool ShouldPopStack(ElementType token, Element peek)
+        public static bool ShouldPopStack(FormulaElementType token, FormulaElement peek)
         {
             if (IsAssociative(token, RPNConsts.LEFT_ASSOC) && ComparePrecedence(token, peek.elementType) <= 0)
             {
@@ -124,49 +124,49 @@ namespace ZeptoFormula
 
         }
 
-        public static int DoOperation(int val1, int val2, ElementType op)
+        public static int DoOperation(int val1, int val2, FormulaElementType op)
         {
             switch (op)
             {
-                case ElementType.ADD:
+                case FormulaElementType.ADD:
                     return val1 + val2;
-                case ElementType.SUBTRACT:
+                case FormulaElementType.SUBTRACT:
                     return val1 - val2;
-                case ElementType.MULTIPLY:
+                case FormulaElementType.MULTIPLY:
                     return val1 * val2;
-                case ElementType.DIVIDE:
+                case FormulaElementType.DIVIDE:
                     return val1 / val2;
-                case ElementType.MODULO:
+                case FormulaElementType.MODULO:
                     return val1 % val2;
-                case ElementType.MIN:
+                case FormulaElementType.MIN:
                     return (val1 < val2) ? val1 : val2;
-                case ElementType.MAX:
+                case FormulaElementType.MAX:
                     return (val1 > val2) ? val1 : val2;
-                case ElementType.EQUALTO:
+                case FormulaElementType.EQUALTO:
                     return (val1 == val2) ? 1 : 0;
-                case ElementType.NOTEQUALTO:
+                case FormulaElementType.NOTEQUALTO:
                     return (val1 != val2) ? 1 : 0;
-                case ElementType.GREATERTHAN:
+                case FormulaElementType.GREATERTHAN:
                     return (val1 > val2) ? 1 : 0;
-                case ElementType.GREATERTHANEQUALTO:
+                case FormulaElementType.GREATERTHANEQUALTO:
                     return (val1 >= val2) ? 1 : 0;
-                case ElementType.LESSTHAN:
+                case FormulaElementType.LESSTHAN:
                     return (val1 < val2) ? 1 : 0;
-                case ElementType.LESSTHANEQUALTO:
+                case FormulaElementType.LESSTHANEQUALTO:
                     return (val1 <= val2) ? 1 : 0;
-                case ElementType.LOGICALAND:
+                case FormulaElementType.LOGICALAND:
                     return (val1 > 0 && val2 > 0) ? 1 : 0;
-                case ElementType.LOGICALOR:
+                case FormulaElementType.LOGICALOR:
                     return (val1 > 0 || val2 > 0) ? 1 : 0;
-                case ElementType.BITWISEOR:
+                case FormulaElementType.BITWISEOR:
                     return val1 | val2;
-                case ElementType.BITWISEAND:
+                case FormulaElementType.BITWISEAND:
                     return val1 & val2;
-                case ElementType.BITWISEMATCHANY:
+                case FormulaElementType.BITWISEMATCHANY:
                     return (val1 & val2) > 0 ? 1 : 0;
-                case ElementType.BITWISEMATCHALL:
+                case FormulaElementType.BITWISEMATCHALL:
                     return (val1 & val2) == val2 ? 1 : 0;
-                case ElementType.BITWISEEXCLUDEANY:
+                case FormulaElementType.BITWISEEXCLUDEANY:
                     return (val1 & val2) == 0 ? 1 : 0;
                 default:
                     return 0;
@@ -174,40 +174,40 @@ namespace ZeptoFormula
         }
 
 
-        private static float DoFloatOperation(float val1, float val2, ElementType op)
+        private static float DoFloatOperation(float val1, float val2, FormulaElementType op)
         {
             const float epsilon = 0.0001f;
             switch (op)
             {
-                case ElementType.ADD:
+                case FormulaElementType.ADD:
                     return val1 + val2;
-                case ElementType.SUBTRACT:
+                case FormulaElementType.SUBTRACT:
                     return val1 - val2;
-                case ElementType.MULTIPLY:
+                case FormulaElementType.MULTIPLY:
                     return val1 * val2;
-                case ElementType.DIVIDE:
+                case FormulaElementType.DIVIDE:
                     return val1 / val2;
-                case ElementType.MODULO:
+                case FormulaElementType.MODULO:
                     return (int)val1 % (int)val2;
-                case ElementType.MIN:
+                case FormulaElementType.MIN:
                     return (val1 < val2) ? val1 : val2;
-                case ElementType.MAX:
+                case FormulaElementType.MAX:
                     return (val1 > val2) ? val1 : val2;
-                case ElementType.EQUALTO:
+                case FormulaElementType.EQUALTO:
                     return System.Math.Abs(val1 - val2) < epsilon ? 1.0f : 0.0f;
-                case ElementType.NOTEQUALTO:
+                case FormulaElementType.NOTEQUALTO:
                     return System.Math.Abs(val1 - val2) > epsilon ? 1.0f : 0.0f;
-                case ElementType.GREATERTHAN:
+                case FormulaElementType.GREATERTHAN:
                     return val1 > (val2 + epsilon) ? 1.0f : 0.0f;
-                case ElementType.GREATERTHANEQUALTO:
+                case FormulaElementType.GREATERTHANEQUALTO:
                     return val1 > (val2 - epsilon) ? 1.0f : 0.0f;
-                case ElementType.LESSTHAN:
+                case FormulaElementType.LESSTHAN:
                     return val1 < (val2 - epsilon) ? 1.0f : 0.0f;
-                case ElementType.LESSTHANEQUALTO:
+                case FormulaElementType.LESSTHANEQUALTO:
                     return val1 < (val2 + epsilon) ? 1.0f : 0.0f;
-                case ElementType.LOGICALAND:
+                case FormulaElementType.LOGICALAND:
                     return (val1 > epsilon && val2 > epsilon) ? 1.0f : 0.0f;
-                case ElementType.LOGICALOR:
+                case FormulaElementType.LOGICALOR:
                     return (val1 > epsilon || val2 > epsilon) ? 1.0f : 0.0f;
                 default:
                     return 0;
