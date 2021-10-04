@@ -10,9 +10,9 @@ namespace ZeptoInstruction
     {
         public static void Run()
         {
-            //TestZero();
+            TestZero();
             TestOne();
-            //TestTwo();
+            TestTwo();
             TestThree();
             Console.WriteLine("Instruction Test Passed");
         }
@@ -24,7 +24,6 @@ namespace ZeptoInstruction
             string[] prepContents = new string[]{""};
             string[] bodyContents = new string[]{"4"};
             
-            
             IInstructionContext ctx = InstructionFactory.MakeContext(varContents, verbContents, prepContents);
             List<Instruction> instrList = new List<Instruction>();
             List<string> buffer = new List<string>();
@@ -35,10 +34,11 @@ namespace ZeptoInstruction
         {
             string varContents = "HP,ENERGY";
             string verbContents = "explode";
-            string[] prepContents = new string[]{"HP=1,ENERGY=1"};
-            string[] bodyContents = new string[]{"if HP >1","  HP = 3","ENERGY = 3"};
+            string[] prepContents = new string[]{"HP=1","ENERGY=1"};
+            string[] bodyContents = new string[]{"if HP > 1","  HP = 3","ENERGY = 3"};
             
             IInstructionContext ctx = InstructionFactory.MakeContext(varContents, verbContents, prepContents);
+           
             List<Instruction> instrList = new List<Instruction>();
             List<string> buffer = new List<string>();
             InstructionFactory.MakeList(ctx, bodyContents, ref instrList, ref buffer);
@@ -54,7 +54,7 @@ namespace ZeptoInstruction
         {
             string varContents = "HP,ENERGY";
             string verbContents = "explode,laser";
-            string[] prepContents = new string[]{"HP=1,ENERGY=1"};
+            string[] prepContents = new string[]{"HP=1","ENERGY=1"};
             string[] bodyContents = new string[]{"if explode(3) > laser(HP)","  HP = explode(1) + laser(2)","ENERGY = 3"};
             
             

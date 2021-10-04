@@ -7,28 +7,20 @@ namespace ZeptoCommon
     public static class Parser
     {
         
-        public static int GetDepth(string line)
+        public static string Sanitize(string line, out int depth)
         {
+            int indexOfComment = line.IndexOf("//");
+            if (indexOfComment != -1)
+            {
+                line = line.Substring(0, indexOfComment);
+            }
+            line = line.TrimEnd();
             int fullLen = line.Length;
-            line = line.ToUpper().TrimStart();
-            int trimLen = line.Length;
-            return fullLen - trimLen;
+            string trimmedLine = line.ToUpper().TrimStart();
+            depth = fullLen - trimmedLine.Length;
+            return trimmedLine;
         }
         
-        public static void StripComments(string[] lines)
-        {
-            for (int i = 0; i < lines.Length; ++i)
-            {
-                string line = lines[i];
-                int indexOfComment = line.IndexOf("//");
-                if (indexOfComment != -1)
-                {
-                    line = line.Substring(0, indexOfComment);
-                }
-                line = line.TrimEnd();
-                lines[i] = line;
-            }
-        }
 
         public static List<string> CommaSeparatedIntoChunks(string line)
         {

@@ -7,35 +7,32 @@ namespace ZeptoFormula
 {
     public static class FormulaFactory
     {
-        public static IFormulaContext MakeContext(string varContents, string[] fileContents)
+        public static IFormulaContext MakeContext(string varContents, string[] contents)
         {
             IFormulaContext ctx = new ZeptoCommon.Context();
             List<string> varChunks = Parser.CommaSeparatedIntoChunks(varContents);
             ctx.AddVariableNameList(varChunks);
 
-            Parser.StripComments(fileContents);
             List<string> buffer = new List<string>();
-            for(int i=0; i<fileContents.Length; ++i)
+            for(int i=0; i<contents.Length; ++i)
             {
-                Parser.StringIntoChunks(fileContents[i], ref buffer);
+                int depth;
+                string line = Parser.Sanitize(contents[i], out depth);
+                Parser.StringIntoChunks(line, ref buffer);
                 Formula f = FormulaFactory.Make(ctx, buffer);
                 f.Calculate(ctx);
             }
             return ctx;
         }
 
-        public static Formula Make(IFormulaContext ctx, List<string> stringChunks)
+        public static Formula Make(IFormulaContext ctx, List<string> stringChunks, int chunkStart = 0)
         {
             Formula resultFormula;
             List<FormulaElement> elementList = new List<FormulaElement>();
             resultFormula = new Formula();
-            for (int i = 0; i < stringChunks.Count; ++i)
+            for (int i = chunkStart; i < stringChunks.Count; ++i)
             {
                 string str = stringChunks[i];        
-                if (str.StartsWith("\""))
-                {
-                    continue;
-                }
                 str = str.ToUpper();
                 if (RPNConsts.AssignStrings.ContainsKey(str))
                 {

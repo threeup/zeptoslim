@@ -97,7 +97,13 @@ namespace ZeptoCommon
                 sb.Append('=');
                 sb.AppendLine(VariableValues[kvp.Value].ToString());
             }
+            foreach (KeyValuePair<string, Func<int, bool>> kvp in VerbActionDict)
+            {
+                sb.Append(kvp.Key);
+                sb.Append('*');
+                
+            }
             return sb.ToString();
         }
     }
-}
+};

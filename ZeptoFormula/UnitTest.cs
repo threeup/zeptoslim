@@ -13,7 +13,7 @@ namespace ZeptoFormula
             TestOne();
             TestTwo();
             TestThree();
-            Console.WriteLine("Test Passed");
+            Console.WriteLine("Formula Test Passed");
         }
 
         public static void TestZero()
@@ -25,7 +25,7 @@ namespace ZeptoFormula
             IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
-            Formula f = FormulaFactory.Make(ctx, buffer);
+            Formula f = FormulaFactory.Make(ctx, buffer, 0);
             int val = f.Calculate(ctx);
             
             if(val != 4)
@@ -42,7 +42,7 @@ namespace ZeptoFormula
             IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
-            Formula f = FormulaFactory.Make(ctx, buffer);
+            Formula f = FormulaFactory.Make(ctx, buffer, 0);
             int val = f.Calculate(ctx);
 
             if(val != 8)
@@ -60,7 +60,7 @@ namespace ZeptoFormula
             IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
-            Formula f = FormulaFactory.Make(ctx, buffer);
+            Formula f = FormulaFactory.Make(ctx, buffer, 0);
             int val = f.Calculate(ctx);
             
             if(val != 11)
@@ -81,7 +81,7 @@ namespace ZeptoFormula
             Parser.StringIntoChunks(testLine, ref buffer);
             try
             {
-                Formula f = FormulaFactory.Make(ctx, buffer);
+                Formula f = FormulaFactory.Make(ctx, buffer, 0);
             }
             catch(Exception)
             {
