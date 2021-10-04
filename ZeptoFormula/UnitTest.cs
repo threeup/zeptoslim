@@ -18,11 +18,11 @@ namespace ZeptoFormula
 
         public static void TestZero()
         {
-            string varFileContents = "HP, , ";
-            string[] prepFileContents = new string[]{""};
+            string varContents = "HP, , ";
+            string[] prepContents = new string[]{""};
             string testLine = "4";
             
-            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
             Formula f = FormulaFactory.Make(ctx, buffer);
@@ -35,11 +35,11 @@ namespace ZeptoFormula
         }
         public static void TestOne()
         {
-            string varFileContents = "HP";
-            string[] prepFileContents = new string[]{"HP=5"};
+            string varContents = "HP";
+            string[] prepContents = new string[]{"HP=5"};
             string testLine = "HP+3";
 
-            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
             Formula f = FormulaFactory.Make(ctx, buffer);
@@ -52,12 +52,12 @@ namespace ZeptoFormula
         }
         public static void TestTwo()
         {
-            string varFileContents = "HP, ENERGY, ";
-            string[] prepFileContents = new string[]{"HP=5","ENERGY=2"};
+            string varContents = "HP, ENERGY, ";
+            string[] prepContents = new string[]{"HP=5","ENERGY=2"};
             string testLine = "HP += 3*ENERGY";
 
 
-            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
             Formula f = FormulaFactory.Make(ctx, buffer);
@@ -71,12 +71,12 @@ namespace ZeptoFormula
         }
         public static void TestThree()
         {
-            string varFileContents = "HP, ENERGY, ";
-            string[] prepFileContents = new string[]{"HP=15","ENERGY=2"};
+            string varContents = "HP, ENERGY, ";
+            string[] prepContents = new string[]{"HP=15","ENERGY=2"};
             string testLine = "HP = ENERGY+";
 
            
-            IFormulaContext ctx = FormulaFactory.MakeContext(varFileContents, prepFileContents);
+            IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
             List<string> buffer = new List<string>();
             Parser.StringIntoChunks(testLine, ref buffer);
             try

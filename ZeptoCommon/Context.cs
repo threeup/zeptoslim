@@ -21,6 +21,10 @@ namespace ZeptoCommon
             Func<int, bool> f = Noop;
             VerbActionDict.Add(verbName, f);
         }
+        public void AddVerbNameList(List<string> nameList)
+        {
+            nameList.ForEach(x => AddVerbName(x));
+        }
         public bool ContainsVerbName(string verbName)
         {
             return VerbActionDict.ContainsKey(verbName);
@@ -37,9 +41,9 @@ namespace ZeptoCommon
             VariableValues.Add(idx, 0);
         }
         
-        public void AddVariableNameList(List<string> varNameList)
+        public void AddVariableNameList(List<string> nameList)
         {
-            varNameList.ForEach(x => AddVariableName(x));
+            nameList.ForEach(x => AddVariableName(x));
         }
         public bool ContainsVariableName(string varName)
         {

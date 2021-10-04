@@ -7,17 +7,17 @@ namespace ZeptoFormula
 {
     public static class FormulaFactory
     {
-        public static IFormulaContext MakeContext(string varFileContents, string[] prepFileContents)
+        public static IFormulaContext MakeContext(string varContents, string[] fileContents)
         {
             IFormulaContext ctx = new ZeptoCommon.Context();
-            List<string> varChunks = Parser.CommaSeparatedIntoChunks(varFileContents);
+            List<string> varChunks = Parser.CommaSeparatedIntoChunks(varContents);
             ctx.AddVariableNameList(varChunks);
 
-            Parser.StripComments(prepFileContents);
+            Parser.StripComments(fileContents);
             List<string> buffer = new List<string>();
-            for(int i=0; i<prepFileContents.Length; ++i)
+            for(int i=0; i<fileContents.Length; ++i)
             {
-                Parser.StringIntoChunks(prepFileContents[i], ref buffer);
+                Parser.StringIntoChunks(fileContents[i], ref buffer);
                 Formula f = FormulaFactory.Make(ctx, buffer);
                 f.Calculate(ctx);
             }

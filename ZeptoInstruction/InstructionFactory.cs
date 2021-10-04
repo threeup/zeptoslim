@@ -9,38 +9,64 @@ namespace ZeptoInstruction
     public static class InstructionFactory
     {
 
-        public static void Make(ZeptoInstruction.Instruction instr, IFormulaContext fctx, IInstructionContext ictx, List<string> stringChunks)
+        public static IInstructionContext MakeContext(string varContents, string verbFileContents, string[] fileContents)
         {
-            //if explode(3) > laser(HP):
-            //    SET HP = ENERGY*3=
-            for (int i = instr.chunkIndex; i < stringChunks.Count; ++i)
+            ZeptoCommon.Context ctx = new ZeptoCommon.Context();
+            List<string> varChunks = Parser.CommaSeparatedIntoChunks(varContents);
+            ctx.AddVariableNameList(varChunks);
+            List<string> verbChunks = Parser.CommaSeparatedIntoChunks(verbFileContents);
+            ctx.AddVerbNameList(verbChunks);
+
+            Parser.StripComments(fileContents);
+            List<string> buffer = new List<string>();
+            for (int i = 0; i < fileContents.Length; ++i)
             {
-                string str = stringChunks[i];        
-                if (str.StartsWith("\""))
-                {
-                    continue;
-                }
-                str = str.ToUpper();
+                Formula f = FormulaFactory.Make(ctx, buffer);
+                f.Calculate(ctx);
+            }
+            return ctx as IInstructionContext;
+        }
+
+        public static void MakeList(IInstructionContext ctx, string[] contents, 
+            ref List<Instruction> list, ref List<string> buffer)
+        {
+            IFormulaContext fctx = ctx as IFormulaContext;
+            for (int i = 0; i < contents.Length; ++i)
+            {
+                int depth = Parser.GetDepth(contents[i]);
+                Parser.StringIntoChunks(contents[i], ref buffer);
+                Instruction instr = new Instruction(depth);
+                InstructionFactory.Make(instr, fctx, ctx, buffer, 0);
+                list.Add(instr);
+                Console.WriteLine(instr.ToLongString());
+            }
+        }
+
+
+        public static void Make(Instruction instr, IFormulaContext fctx, IInstructionContext ictx, List<string> stringChunks, int chunkOffset)
+        {
+            for (int i = chunkOffset; i < stringChunks.Count; ++i)
+            {
+                string str = stringChunks[i];
                 if (LogicConsts.ConditionStrings.ContainsKey(str))
                 {
-                    Instruction subInstruction = new Instruction(ZeptoInstruction.LogicConsts.ConditionStrings[str], i+1);
-                    Make(subInstruction, fctx, ictx, stringChunks);
+                    Instruction subInstruction = new Instruction(instr.depth, ZeptoInstruction.LogicConsts.ConditionStrings[str]);
+                    Make(subInstruction, fctx, ictx, stringChunks, i+1);
                     instr.AddSubInstruction(subInstruction);
                     break;
                 }
                 if (ictx.ContainsVerbName(str))
                 {
-                    Instruction subInstruction = new Instruction(ZeptoInstruction.LogicConsts.ConditionStrings[str], i+1);
-                    Make(subInstruction, fctx, ictx, stringChunks);
+                    Instruction subInstruction = new Instruction(instr.depth, str);
+                    Make(subInstruction, fctx, ictx, stringChunks, i+1);
                     instr.AddSubInstruction(subInstruction);
                     break;
                 }
-                instr.AddFormula(FormulaFactory.Make(fctx, stringChunks));
-                break;
+                //instr.AddFormula(FormulaFactory.Make(fctx, stringChunks));
             }
         }
 
-        
+
         // public static GumboInstruction InstructionFromChunks(List<string> stringChunks, int depth)
         // {
         //     GumboInstruction result;

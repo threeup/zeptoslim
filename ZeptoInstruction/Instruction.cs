@@ -5,31 +5,31 @@ namespace ZeptoInstruction
 {
     public class Instruction
     {
+        public int depth = 0;
         public Condition condition;
         public string verb;
-        public int chunkIndex = 0;
 
         private List<Instruction> subInstructions = null;
         private ZeptoFormula.Formula formula = null;
 
-        public Instruction(int chunkIndex)
+        public Instruction(int depth)
         {
-            condition = Condition.NONE;
-            verb = "";
-            this.chunkIndex = chunkIndex;
+            this.condition = Condition.NONE;
+            this.verb = "";
+            this.depth = depth;
         }
 
-        public Instruction(Condition condition, int chunkIndex)
+        public Instruction(int depth, Condition condition)
         {
             this.condition = condition;
-            verb = "";
-            this.chunkIndex = chunkIndex;
+            this.verb = "";
+            this.depth = depth;
         }
-        public Instruction(string verb, int chunkIndex)
+        public Instruction(int depth, string verb)
         {
-            condition = Condition.NONE;
+            this.condition = Condition.NONE;
             this.verb = verb;
-            this.chunkIndex = chunkIndex;
+            this.depth = depth;
         }
 
         public void AddSubInstruction(Instruction sub)
@@ -44,6 +44,12 @@ namespace ZeptoInstruction
         public void AddFormula(ZeptoFormula.Formula formula)
         {
             this.formula = formula;
+        }
+
+        public string ToLongString()
+        {
+            int subCount = subInstructions != null ? subInstructions.Count: 0;
+            return "Inst Depth:"+depth+" sub:"+subCount;
         }
     }
 }

@@ -13,6 +13,8 @@ namespace zeptolib
         {
             ZeptoFormula.UnitTest.Run();
             Console.ReadKey();
+            ZeptoInstruction.UnitTest.Run();
+            Console.ReadKey();
             Console.WriteLine("Hello World!");
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 

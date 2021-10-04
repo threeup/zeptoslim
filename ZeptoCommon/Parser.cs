@@ -6,7 +6,15 @@ namespace ZeptoCommon
 
     public static class Parser
     {
-
+        
+        public static int GetDepth(string line)
+        {
+            int fullLen = line.Length;
+            line = line.ToUpper().TrimStart();
+            int trimLen = line.Length;
+            return fullLen - trimLen;
+        }
+        
         public static void StripComments(string[] lines)
         {
             for (int i = 0; i < lines.Length; ++i)
