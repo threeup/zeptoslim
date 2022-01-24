@@ -58,7 +58,7 @@ public static class UnitTest
         string varContents = "HP,ENERGY";
         string verbContents = "explode,laser";
         string[] prepContents = new string[] { "HP=1", "ENERGY=1" };
-        string[] bodyContents = new string[] { "if explode(3) > laser(HP)", "  HP = explode(1) + laser(2)", "ENERGY = 3" };
+        string[] bodyContents = new string[] { "if explode(3) > laser(HP)", "explode(laser(3+HP+ENERGY))", "ENERGY = 3" };
 
 
         IInstructionContext ctx = InstructionFactory.MakeContext(varContents, verbContents, prepContents);
