@@ -2,34 +2,39 @@ namespace ZeptoInstruction;
 
 public class Instruction
 {
-  public int depth = 0;
-  public Condition condition;
-  public Expression? expression = null;
+    public int depth = 0;
+    public Condition condition;
+    public Expression? expression = null;
 
 
-  public Instruction(int depth)
-  {
-    this.condition = Condition.NONE;
-    this.depth = depth;
-  }
-
-
-  public string ToLongString()
-  {
-    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-    for (int i = 0; i < depth; ++i)
+    public Instruction(int depth)
     {
-      sb.Append(' ');
+        this.condition = Condition.NONE;
+        this.depth = depth;
     }
-    if (this.condition != Condition.NONE)
+
+    public bool IsConditional()
     {
-      sb.Append(this.condition.ToString());
+        return condition == Condition.IF || condition == Condition.ELSEIF || condition == Condition.ELSE;
     }
-    if (expression != null)
+
+
+    public string ToLongString()
     {
-      sb.Append(" exec:");
-      sb.Append(expression?.ToString() ?? "");
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        for (int i = 0; i < depth; ++i)
+        {
+            sb.Append(' ');
+        }
+        if (this.condition != Condition.NONE)
+        {
+            sb.Append(this.condition.ToString());
+        }
+        if (expression != null)
+        {
+            sb.Append(" exec:");
+            sb.Append(expression?.ToString() ?? "");
+        }
+        return sb.ToString();
     }
-    return sb.ToString();
-  }
 }

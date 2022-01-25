@@ -5,21 +5,6 @@ using ZeptoBehave;
 
 namespace ZeptoInstruction;
 
-public struct ChunkSpan
-{
-    public int start;
-    public int end;
-    public ChunkSpan(int start, int end)
-    {
-        this.start = start;
-        this.end = end;
-    }
-    public override string ToString()
-    {
-        return "[" + start + "_" + end + "]";
-    }
-}
-
 
 public static class InstructionFactory
 {

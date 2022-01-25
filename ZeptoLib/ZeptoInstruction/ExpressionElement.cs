@@ -1,6 +1,6 @@
 using ZeptoFormula;
-namespace ZeptoInstruction;
 
+namespace ZeptoInstruction;
 
 public struct ExpressionElement
 {

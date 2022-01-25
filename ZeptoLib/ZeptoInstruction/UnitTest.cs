@@ -96,8 +96,8 @@ public static class UnitTest
     List<Instruction> instrList = new List<Instruction>();
     List<string> buffer = new List<string>();
     InstructionFactory.MakeList(c.ctx, bodyContents, ref instrList, ref buffer);
-    c.AddInstructions(instrList);
-    c.Do();
+    c.MakeTree(instrList);
+    c.ConsumeRoot();
     CheckContext(c.ctx, ref answers);
   }
 
