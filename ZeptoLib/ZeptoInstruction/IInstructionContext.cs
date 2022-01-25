@@ -6,5 +6,6 @@ namespace ZeptoInstruction;
         bool ContainsMethodName(string methodName);
         public void SetMethodPtr(string methodName, Func<int, int> f);
         System.Func<int, int> GetMethodPtr(string methodName);
+        void CopyMethodData(IInstructionContext other);
         string ToLongString();
     }

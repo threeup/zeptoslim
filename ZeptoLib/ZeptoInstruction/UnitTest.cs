@@ -9,14 +9,15 @@ public static class UnitTest
 {
   public static void Run()
   {
-    TestZero();
-    TestOne();
-    TestTwo();
-    TestThree();
+    FlatTestZero();
+    FlatTestOne();
+    FlatTestTwo();
+    FlatTestThree();
+    BranchTestZero();
     Console.WriteLine("Instruction Test Passed");
   }
 
-  public static void TestZero()
+  public static void FlatTestZero()
   {
     string varContents = "HP, , ";
     string methodContents = " ";
@@ -31,7 +32,7 @@ public static class UnitTest
     CheckAnswers(ictx, ref instrList, ref answers);
 
   }
-  public static void TestOne()
+  public static void FlatTestOne()
   {
     string varContents = "HP,ENERGY";
     string methodContents = "explode";
@@ -47,7 +48,7 @@ public static class UnitTest
     CheckAnswers(ictx, ref instrList, ref answers);
 
   }
-  public static void TestTwo()
+  public static void FlatTestTwo()
   {
     string varContents = "HP,ENERGY";
     string methodContents = " ";
@@ -64,7 +65,7 @@ public static class UnitTest
 
     CheckAnswers(ictx, ref instrList, ref answers);
   }
-  public static void TestThree()
+  public static void FlatTestThree()
   {
     string varContents = "HP,ENERGY";
     string methodContents = "explode,laser";
@@ -81,12 +82,31 @@ public static class UnitTest
     CheckAnswers(ictx, ref instrList, ref answers);
   }
 
+  public static void BranchTestZero()
+  {
+    string varContents = "HP, , ";
+    string methodContents = " ";
+    string[] prepContents = new string[] { "HP=1" };
+    string[] bodyContents = new string[] { "if 0", " HP=5" };
+    int[] answers = new int[] { 1 };
+
+    Consumer c = new Consumer();
+    c.SetContext(varContents, methodContents);
+    c.ConsumeFormulaList(prepContents);
+    List<Instruction> instrList = new List<Instruction>();
+    List<string> buffer = new List<string>();
+    InstructionFactory.MakeList(c.ctx, bodyContents, ref instrList, ref buffer);
+    c.AddInstructions(instrList);
+    c.Do();
+    CheckContext(c.ctx, ref answers);
+  }
+
   private static void CheckAnswers(IInstructionContext ictx, ref List<Instruction> instrList, ref int[] answers)
   {
     IFormulaContext? fctx = ictx as IFormulaContext;
     for (int i = 0; i < instrList.Count; ++i)
     {
-      Expression? ex = instrList[i].execution;
+      Expression? ex = instrList[i].expression;
       if (ex != null && fctx != null)
       {
         int val = ex.Calculate(fctx, ictx);
@@ -96,5 +116,22 @@ public static class UnitTest
         }
       }
     }
+  }
+
+  private static void CheckContext(IInstructionContext ictx, ref int[] answers)
+  {
+    IFormulaContext? fctx = ictx as IFormulaContext;
+    for (int i = 0; i < answers.Length; ++i)
+    {
+      if (fctx != null)
+      {
+        int val = fctx.GetVariableValue(i);
+        if (val != answers[i])
+        {
+          throw new Exception("Test fail " + val + " Expected:" + answers[i]);
+        }
+      }
+    }
+
   }
 }

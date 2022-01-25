@@ -6,4 +6,4 @@ Console.WriteLine("Test start");
 ZeptoInstruction.UnitTest.Run();
 Console.WriteLine("Test complete");
 
-//Main m = new Main();
+Main m = new Main();

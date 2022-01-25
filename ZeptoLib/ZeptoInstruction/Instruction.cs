@@ -4,29 +4,15 @@ public class Instruction
 {
   public int depth = 0;
   public Condition condition;
-  public Expression? execution = null;
-  public string verb;
+  public Expression? expression = null;
 
 
   public Instruction(int depth)
   {
     this.condition = Condition.NONE;
-    this.verb = "";
     this.depth = depth;
   }
 
-  public Instruction(int depth, Condition condition)
-  {
-    this.condition = condition;
-    this.verb = "";
-    this.depth = depth;
-  }
-  public Instruction(int depth, string verb)
-  {
-    this.condition = Condition.NONE;
-    this.verb = verb;
-    this.depth = depth;
-  }
 
   public string ToLongString()
   {
@@ -39,10 +25,10 @@ public class Instruction
     {
       sb.Append(this.condition.ToString());
     }
-    if (execution != null)
+    if (expression != null)
     {
       sb.Append(" exec:");
-      sb.Append(execution?.ToString() ?? "");
+      sb.Append(expression?.ToString() ?? "");
     }
     return sb.ToString();
   }

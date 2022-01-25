@@ -107,6 +107,17 @@ public class Context : IFormulaContext, IInstructionContext
     return varVals[elementIndex];
   }
 
+  public void CopyVariableData(IFormulaContext other)
+  {
+
+    // todo
+  }
+
+  public void CopyMethodData(IInstructionContext other)
+  {
+    // todo
+  }
+  
   public string ToLongString()
   {
     System.Text.StringBuilder sb = new System.Text.StringBuilder();
