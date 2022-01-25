@@ -2,39 +2,38 @@ using ZeptoFormula;
 namespace ZeptoInstruction;
 
 
-
-public struct ExecutionElement
+public struct ExpressionElement
 {
   public FormulaElementType? formulaElementType;
-  public string? verbName;
+  public string? methodName;
 
   public int val;
 
-  public ExecutionElement(FormulaElementType elementType)
+  public ExpressionElement(FormulaElementType elementType)
   {
     this.formulaElementType = elementType;
-    this.verbName = null;
+    this.methodName = null;
     this.val = 0;
   }
-  public ExecutionElement(string verbName)
+  public ExpressionElement(string verbName)
   {
     this.formulaElementType = null;
-    this.verbName = verbName;
+    this.methodName = verbName;
     this.val = 0;
   }
-  public ExecutionElement(int val)
+  public ExpressionElement(int val)
   {
     this.formulaElementType = FormulaElementType.CONST;
-    this.verbName = null;
+    this.methodName = null;
     this.val = val;
   }
-  public static ExecutionElement BlankElement = new ExecutionElement(FormulaElementType.NONE);
+  public static ExpressionElement BlankElement = new ExpressionElement(FormulaElementType.NONE);
 
   public override string ToString()
   {
-    if (verbName != null)
+    if (methodName != null)
     {
-      return verbName;
+      return methodName;
     }
     FormulaElementType token = formulaElementType ?? FormulaElementType.NONE;
     if (val != 0 || token == FormulaElementType.CONST)

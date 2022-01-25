@@ -2,28 +2,28 @@
 using ZeptoFormula;
 namespace ZeptoInstruction;
 
-public class Execution
+public class Expression
 {
 
   public bool isConst = true;
   public List<int>? varBindings = null;
   public List<int>? methodBindings = null;
 
-  private List<ExecutionElement> rpnFormula = new List<ExecutionElement>();
+  private List<ExpressionElement> rpnFormula = new List<ExpressionElement>();
 
-  Stack<ExecutionElement> stackBuffer = new Stack<ExecutionElement>();
+  Stack<ExpressionElement> stackBuffer = new Stack<ExpressionElement>();
 
 
-  public Execution()
+  public Expression()
   {
     isConst = true;
   }
 
-  public void AddElementList(List<ExecutionElement> elements)
+  public void AddElementList(List<ExpressionElement> elements)
   {
     stackBuffer.Clear();
     rpnFormula.Clear();
-    ExecutionRPN.InfixToRPN(elements, ref stackBuffer, ref rpnFormula, out isConst);
+    ExpressionRPN.InfixToRPN(elements, ref stackBuffer, ref rpnFormula, out isConst);
   }
 
   public int AddVarBinding(int varIndex)
@@ -124,20 +124,20 @@ public class Execution
       return 0;
     }
     stackBuffer.Clear();
-    ExecutionElement el = ExecutionElement.BlankElement;
+    ExpressionElement el = ExpressionElement.BlankElement;
     for (int i = 0; i < rpnFormula.Count; ++i)
     {
       el = rpnFormula[i];
       //Console.WriteLine("  "+el.ToString());
-      if(el.verbName != null)
+      if(el.methodName != null)
       {
         if (stackBuffer.Count >= 1)
         {
-          ExecutionElement elOne = stackBuffer.Pop();
+          ExpressionElement elOne = stackBuffer.Pop();
           int valOne = GetVal(fctx, elOne.formulaElementType, elOne.val);
-          var func = ictx.GetVerbAction(el.verbName);
+          var func = ictx.GetMethodPtr(el.methodName);
           int result = func(valOne);
-          stackBuffer.Push(new ExecutionElement(result));
+          stackBuffer.Push(new ExpressionElement(result));
         }
         else
         {
@@ -151,11 +151,11 @@ public class Execution
         {
           if (stackBuffer.Count >= 2 && varBindings != null)
           {
-            ExecutionElement elOne = stackBuffer.Pop();
-            ExecutionElement elTwo = stackBuffer.Pop();
+            ExpressionElement elOne = stackBuffer.Pop();
+            ExpressionElement elTwo = stackBuffer.Pop();
             int boundIndex = varBindings[VarRegisterToInt(elTwo.formulaElementType.GetValueOrDefault())];
             int result = fctx.DoAssign(elementType, boundIndex, elOne.val);
-            stackBuffer.Push(new ExecutionElement(result));
+            stackBuffer.Push(new ExpressionElement(result));
           }
           else
           {
@@ -166,12 +166,12 @@ public class Execution
         {
           if (stackBuffer.Count >= 2)
           {
-            ExecutionElement elOne = stackBuffer.Pop();
-            ExecutionElement elTwo = stackBuffer.Pop();
+            ExpressionElement elOne = stackBuffer.Pop();
+            ExpressionElement elTwo = stackBuffer.Pop();
             int valOne = GetVal(fctx, elOne.formulaElementType, elOne.val);
             int valTwo = GetVal(fctx, elTwo.formulaElementType, elTwo.val);
             int result = RPN.DoOperation(elementType, valTwo, valOne);
-            stackBuffer.Push(new ExecutionElement(result));
+            stackBuffer.Push(new ExpressionElement(result));
           }
           else
           {
@@ -180,11 +180,11 @@ public class Execution
         }
         else if (RPN.IsRegisterType(elementType))
         {
-          stackBuffer.Push(new ExecutionElement(elementType));
+          stackBuffer.Push(new ExpressionElement(elementType));
         }
         else
         {
-          stackBuffer.Push(new ExecutionElement(el.val));
+          stackBuffer.Push(new ExpressionElement(el.val));
         }
       }
     }
@@ -192,7 +192,7 @@ public class Execution
     if (stackBuffer.Count != 1)
       throw new System.Exception("Cannot calculate formula." + stackBuffer.Count + " of " + rpnFormula.Count + " " + ToLongString(fctx, ictx));
 
-    ExecutionElement last = stackBuffer.Pop();
+    ExpressionElement last = stackBuffer.Pop();
     return last.val;
   }
 
@@ -201,13 +201,13 @@ public class Execution
   public string ToLongString(IFormulaContext fctx, IInstructionContext ictx)
   {
     System.Text.StringBuilder sb = new System.Text.StringBuilder(isConst ? "CONST: " : "RPN: ");
-    ExecutionElement element = ExecutionElement.BlankElement;
+    ExpressionElement element = ExpressionElement.BlankElement;
     for (int i = 0; i < rpnFormula.Count; ++i)
     {
       element = rpnFormula[i];
       sb.Append(element);
       FormulaElementType token = element.formulaElementType.GetValueOrDefault();
-      if (ExecutionRPN.IsRegisterType(token))
+      if (ExpressionRPN.IsRegisterType(token))
       {
         int val = GetVal(fctx, token, element.val);
         sb.Append('=');

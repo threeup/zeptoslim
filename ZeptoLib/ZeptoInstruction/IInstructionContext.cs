@@ -2,8 +2,9 @@ namespace ZeptoInstruction;
 
     public interface IInstructionContext
     {
-        void AddVerbName(string verbName);
-        bool ContainsVerbName(string verbName);
-        System.Func<int, int> GetVerbAction(string verbName);
+        void AddMethodName(string methodName);
+        bool ContainsMethodName(string methodName);
+        public void SetMethodPtr(string methodName, Func<int, int> f);
+        System.Func<int, int> GetMethodPtr(string methodName);
         string ToLongString();
     }

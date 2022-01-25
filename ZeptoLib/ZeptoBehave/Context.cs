@@ -6,67 +6,86 @@ namespace ZeptoBehave;
 public class Context : IFormulaContext, IInstructionContext
 {
 
-  public Dictionary<string, Func<int, int>> VerbActionDict = new Dictionary<string, Func<int, int>>();
-  public Dictionary<string, int> VariableNameDict = new Dictionary<string, int>();
-  private Dictionary<int, int> VariableValues = new Dictionary<int, int>();
+  private Dictionary<string, Func<int, int>> methodPtrMap = new Dictionary<string, Func<int, int>>();
+  private Dictionary<string, int> varNameMap = new Dictionary<string, int>();
+  private Dictionary<int, int> varVals = new Dictionary<int, int>();
 
 
   private static int Noop(int something)
   {
-    return 0;
+    return something;
   }
-  private static int Double(int val)
+  public static int Double(int val)
   {
-    return val*2;
+    return val * 2;
   }
-  public void AddVerbName(string verbName)
+  private static string SanitizeString(string s)
   {
-    Func<int, int> f = Double;
-    VerbActionDict.Add(verbName, f);
+    return s.ToUpper();
   }
-  public void AddVerbNameList(List<string> nameList)
+  public void AddMethodName(string methodNameRaw)
   {
-    nameList.ForEach(x => AddVerbName(x));
+    string methodName = SanitizeString(methodNameRaw);
+    Func<int, int> f = Noop;
+    methodPtrMap.Add(methodName, f);
   }
-  public bool ContainsVerbName(string verbName)
+  public bool ContainsMethodName(string methodName)
   {
-    return VerbActionDict.ContainsKey(verbName);
+    return methodPtrMap.ContainsKey(methodName);
   }
-  public Func<int, int> GetVerbAction(string verbName)
+  public void SetMethodPtr(string methodNameRaw, Func<int, int> f)
   {
-    return VerbActionDict[verbName];
+    string methodName = SanitizeString(methodNameRaw);
+    if (ContainsMethodName(methodName))
+    {
+      methodPtrMap[methodName] = f;
+    }
+    else
+    {
+      methodPtrMap.Add(methodName, f);
+    }
   }
 
-  public void AddVariableName(string varName)
+  public void AddMethodNameList(List<string> nameListRaw)
   {
-    int idx = VariableNameDict.Keys.Count;
-    VariableNameDict.Add(varName, idx);
-    VariableValues.Add(idx, 0);
+    nameListRaw.ForEach(x => AddMethodName(x));
+  }
+  public Func<int, int> GetMethodPtr(string methodName)
+  {
+    return methodPtrMap[methodName];
   }
 
-  public void AddVariableNameList(List<string> nameList)
+  public void AddVariableName(string varNameRaw)
   {
-    nameList.ForEach(x => AddVariableName(x));
+    string varName = SanitizeString(varNameRaw);
+    int idx = varNameMap.Keys.Count;
+    varNameMap.Add(varName, idx);
+    varVals.Add(idx, 0);
+  }
+
+  public void AddVariableNameList(List<string> nameListRaw)
+  {
+    nameListRaw.ForEach(x => AddVariableName(x));
   }
   public bool ContainsVariableName(string varName)
   {
-    return VariableNameDict.ContainsKey(varName);
+    return varNameMap.ContainsKey(varName);
   }
 
   public int GetVariableIndex(string varName)
   {
-    return VariableNameDict[varName];
+    return varNameMap[varName];
   }
 
   public void SetVariableValue(string varName, int val)
   {
     int idx = GetVariableIndex(varName);
-    VariableValues[idx] = val;
+    varVals[idx] = val;
   }
 
   public int GetVariableValue(int idx)
   {
-    return VariableValues[idx];
+    return varVals[idx];
   }
 
   public int DoAssign(FormulaElementType assignType, int elementIndex, int val)
@@ -74,33 +93,33 @@ public class Context : IFormulaContext, IInstructionContext
     switch (assignType)
     {
       case FormulaElementType.SET:
-        VariableValues[elementIndex] = val;
+        varVals[elementIndex] = val;
         break;
       case FormulaElementType.INCREMENT:
-        VariableValues[elementIndex] += val;
+        varVals[elementIndex] += val;
         break;
       case FormulaElementType.DECREMENT:
-        VariableValues[elementIndex] -= val;
+        varVals[elementIndex] -= val;
         break;
       default:
         break;
     }
-    return VariableValues[elementIndex];
+    return varVals[elementIndex];
   }
 
   public string ToLongString()
   {
     System.Text.StringBuilder sb = new System.Text.StringBuilder();
     sb.AppendLine("Ctx:");
-    foreach (KeyValuePair<string, int> kvp in VariableNameDict)
+    foreach (KeyValuePair<string, int> kvp in varNameMap)
     {
       sb.Append(kvp.Key);
       sb.Append('#');
       sb.Append(kvp.Value);
       sb.Append('=');
-      sb.AppendLine(VariableValues[kvp.Value].ToString());
+      sb.AppendLine(varVals[kvp.Value].ToString());
     }
-    foreach (KeyValuePair<string, Func<int, int>> kvp in VerbActionDict)
+    foreach (KeyValuePair<string, Func<int, int>> kvp in methodPtrMap)
     {
       sb.Append(kvp.Key);
       sb.Append('*');

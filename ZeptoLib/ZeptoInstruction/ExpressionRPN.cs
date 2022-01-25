@@ -2,16 +2,16 @@
 using ZeptoFormula;
 namespace ZeptoInstruction;
 
-public static class ExecutionRPN
+public static class ExpressionRPN
 {
 
-  public static void InfixToRPN(List<ExecutionElement> input, ref Stack<ExecutionElement> stack, ref List<ExecutionElement> outList, out bool isConst)
+  public static void InfixToRPN(List<ExpressionElement> input, ref Stack<ExpressionElement> stack, ref List<ExpressionElement> outList, out bool isConst)
   {
 
     isConst = true;
     for (int i = 0; i < input.Count; ++i)
     {
-      ExecutionElement element = input[i];
+      ExpressionElement element = input[i];
       FormulaElementType? token = element.formulaElementType;
 
       if (CheckPrecendence(element))
@@ -63,9 +63,9 @@ public static class ExecutionRPN
     return elementType >= FormulaElementType.ADD && elementType <= FormulaElementType.BITWISEEXCLUDEANY;
   }
 
-  public static bool CheckPrecendence(ExecutionElement element)
+  public static bool CheckPrecendence(ExpressionElement element)
   {
-    string? method = element.verbName;
+    string? method = element.methodName;
     if (method != null)
     {
       return true;
@@ -93,7 +93,7 @@ public static class ExecutionRPN
   }
 
 
-  public static bool ShouldPopStack(ExecutionElement current, ExecutionElement peek)
+  public static bool ShouldPopStack(ExpressionElement current, ExpressionElement peek)
   {
     int priCurrent = -10;
     int priPeek = -10;
@@ -102,7 +102,7 @@ public static class ExecutionRPN
       FormulaElementType token = current.formulaElementType.GetValueOrDefault();
       priCurrent = RPNConsts.Precedence[token][0];
     }
-    else if(current.verbName != null)
+    else if(current.methodName != null)
     {
       priCurrent = 20;
     }
@@ -112,7 +112,7 @@ public static class ExecutionRPN
       FormulaElementType peekToken = peek.formulaElementType.GetValueOrDefault();
       priPeek = RPNConsts.Precedence[peekToken][0];
     }
-    else if(peek.verbName != null)
+    else if(peek.methodName != null)
     {
       priPeek = 20;
     }

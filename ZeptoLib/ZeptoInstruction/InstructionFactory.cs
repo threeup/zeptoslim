@@ -27,10 +27,10 @@ public static class InstructionFactory
   public static IInstructionContext MakeContext(string varContents, string verbContents, string[] contents)
   {
     Context ctx = new Context();
-    List<string> varChunks = Parser.CommaSeparatedIntoChunks(varContents.ToUpper());
+    List<string> varChunks = Parser.CommaSeparatedIntoChunks(varContents);
     ctx.AddVariableNameList(varChunks);
-    List<string> verbChunks = Parser.CommaSeparatedIntoChunks(verbContents.ToUpper());
-    ctx.AddVerbNameList(verbChunks);
+    List<string> verbChunks = Parser.CommaSeparatedIntoChunks(verbContents);
+    ctx.AddMethodNameList(verbChunks);
 
     List<string> buffer = new List<string>();
     for (int i = 0; i < contents.Length; ++i)
@@ -80,10 +80,10 @@ public static class InstructionFactory
   }
 
 
-  public static Execution MakeExecution(IFormulaContext fctx, IInstructionContext ictx, List<string> stringChunks, int chunkStart = 0)
+  public static Expression MakeExecution(IFormulaContext fctx, IInstructionContext ictx, List<string> stringChunks, int chunkStart = 0)
   {
-    Execution resultExecution = new Execution();
-    List<ExecutionElement> elementList = new List<ExecutionElement>();
+    Expression resultExecution = new Expression();
+    List<ExpressionElement> elementList = new List<ExpressionElement>();
 
     for (int i = chunkStart; i < stringChunks.Count; ++i)
     {
@@ -92,23 +92,23 @@ public static class InstructionFactory
       if (RPNConsts.AssignStrings.ContainsKey(str))
       {
         FormulaElementType etype = RPNConsts.AssignStrings[str];
-        elementList.Add(new ExecutionElement(etype));
+        elementList.Add(new ExpressionElement(etype));
       }
       else if (RPNConsts.OperatorStrings.ContainsKey(str))
       {
         FormulaElementType etype = RPNConsts.OperatorStrings[str];
-        elementList.Add(new ExecutionElement(etype));
+        elementList.Add(new ExpressionElement(etype));
       }
       else if (fctx.ContainsVariableName(str))
       {
         int varIndex = fctx.GetVariableIndex(str);
         int registerPlace = resultExecution.AddVarBinding(varIndex);
         FormulaElementType elType = Formula.RegisterFromInt(registerPlace);
-        elementList.Add(new ExecutionElement(elType));
+        elementList.Add(new ExpressionElement(elType));
       }
-      else if (ictx.ContainsVerbName(str))
+      else if (ictx.ContainsMethodName(str))
       {
-        elementList.Add(new ExecutionElement(str));
+        elementList.Add(new ExpressionElement(str));
       }
       else
       {
@@ -116,7 +116,7 @@ public static class InstructionFactory
         bool success = int.TryParse(str, out number);
         if (success)
         {
-          elementList.Add(new ExecutionElement(number));
+          elementList.Add(new ExpressionElement(number));
         }
         else
         {
