@@ -6,18 +6,22 @@ namespace ZeptoBehave;
 public class Context : IFormulaContext, IInstructionContext
 {
 
-  public Dictionary<string, Func<int, bool>> VerbActionDict = new Dictionary<string, Func<int, bool>>();
+  public Dictionary<string, Func<int, int>> VerbActionDict = new Dictionary<string, Func<int, int>>();
   public Dictionary<string, int> VariableNameDict = new Dictionary<string, int>();
   private Dictionary<int, int> VariableValues = new Dictionary<int, int>();
 
 
-  private static bool Noop(int something)
+  private static int Noop(int something)
   {
-    return false;
+    return 0;
+  }
+  private static int Double(int val)
+  {
+    return val*2;
   }
   public void AddVerbName(string verbName)
   {
-    Func<int, bool> f = Noop;
+    Func<int, int> f = Double;
     VerbActionDict.Add(verbName, f);
   }
   public void AddVerbNameList(List<string> nameList)
@@ -28,7 +32,7 @@ public class Context : IFormulaContext, IInstructionContext
   {
     return VerbActionDict.ContainsKey(verbName);
   }
-  public Func<int, bool> GetVerbAction(string verbName)
+  public Func<int, int> GetVerbAction(string verbName)
   {
     return VerbActionDict[verbName];
   }
@@ -96,7 +100,7 @@ public class Context : IFormulaContext, IInstructionContext
       sb.Append('=');
       sb.AppendLine(VariableValues[kvp.Value].ToString());
     }
-    foreach (KeyValuePair<string, Func<int, bool>> kvp in VerbActionDict)
+    foreach (KeyValuePair<string, Func<int, int>> kvp in VerbActionDict)
     {
       sb.Append(kvp.Key);
       sb.Append('*');

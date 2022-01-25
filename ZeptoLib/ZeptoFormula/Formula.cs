@@ -143,7 +143,7 @@ public class Formula
           FormulaElement elTwo = stackBuffer.Pop();
           int valOne = GetVal(ctx, elOne);
           int valTwo = GetVal(ctx, elTwo);
-          int result = RPN.DoOperation(valTwo, valOne, elementType);
+          int result = RPN.DoOperation(elementType, valTwo, valOne);
           stackBuffer.Push(new FormulaElement(result));
         }
         else

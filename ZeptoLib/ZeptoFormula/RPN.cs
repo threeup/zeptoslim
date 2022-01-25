@@ -123,7 +123,7 @@ public static class RPN
 
   }
 
-  public static int DoOperation(int val1, int val2, FormulaElementType op)
+  public static int DoOperation(FormulaElementType op, int val1, int val2)
   {
     switch (op)
     {

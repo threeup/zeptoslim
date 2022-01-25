@@ -33,9 +33,9 @@ public static class UnitTest
   }
   public static void TestOne()
   {
-    string varContents = "HP";
-    string[] prepContents = new string[] { "HP=5" };
-    string testLine = "HP+3";
+    string varContents = "HP,ENERGY";
+    string[] prepContents = new string[] { "HP=5", "ENERGY=2" };
+    string testLine = "HP+3*ENERGY";
 
     IFormulaContext ctx = FormulaFactory.MakeContext(varContents, prepContents);
     List<string> buffer = new List<string>();
@@ -43,7 +43,7 @@ public static class UnitTest
     Formula f = FormulaFactory.Make(ctx, buffer, 0);
     int val = f.Calculate(ctx);
 
-    if (val != 8)
+    if (val != 11)
     {
       throw new Exception("TestOne fail");
     }

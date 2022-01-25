@@ -5,6 +5,22 @@ using ZeptoBehave;
 
 namespace ZeptoInstruction;
 
+public struct ChunkSpan
+{
+    public int start;
+    public int end;
+    public ChunkSpan(int start, int end)
+    {
+        this.start = start;
+        this.end = end;
+    }
+    public override string ToString()
+    {
+        return "[" + start + "_" + end + "]";
+    }
+}
+
+
 public static class InstructionFactory
 {
 
@@ -48,33 +64,73 @@ public static class InstructionFactory
 
 
   public static void Make(Instruction instr, IFormulaContext fctx, IInstructionContext ictx,
-      List<string> stringChunks, int chunkStart = 0, int chunkEnd = -1)
+      List<string> stringChunks)
   {
-    int end = chunkEnd < 0 ? stringChunks.Count : chunkEnd;
-    for (int i = chunkStart; i < end; ++i)
+    if (stringChunks.Count > 0)
+    {
+      string first = stringChunks[0];
+      int chunkStart = 0;
+      if (LogicConsts.ConditionStrings.ContainsKey(first))
+      {
+        instr.condition = ZeptoInstruction.LogicConsts.ConditionStrings[first];
+        chunkStart = 1;
+      }
+      instr.execution = MakeExecution(fctx, ictx, stringChunks, chunkStart);
+    }
+  }
+
+
+  public static Execution MakeExecution(IFormulaContext fctx, IInstructionContext ictx, List<string> stringChunks, int chunkStart = 0)
+  {
+    Execution resultExecution = new Execution();
+    List<ExecutionElement> elementList = new List<ExecutionElement>();
+
+    for (int i = chunkStart; i < stringChunks.Count; ++i)
     {
       string str = stringChunks[i];
-      if (LogicConsts.ConditionStrings.ContainsKey(str))
+      str = str.ToUpper();
+      if (RPNConsts.AssignStrings.ContainsKey(str))
       {
-        Instruction subInstruction = new Instruction(instr.depth, ZeptoInstruction.LogicConsts.ConditionStrings[str]);
-        Make(subInstruction, fctx, ictx, stringChunks, i + 1);
-        instr.AddSubInstruction(subInstruction);
-        break;
+        FormulaElementType etype = RPNConsts.AssignStrings[str];
+        elementList.Add(new ExecutionElement(etype));
       }
-      if (ictx.ContainsVerbName(str))
+      else if (RPNConsts.OperatorStrings.ContainsKey(str))
       {
-        Instruction subInstruction = new Instruction(instr.depth, str);
-        int afterLeft, beforeRight;
-        FindGuts(stringChunks, i + 1, out afterLeft, out beforeRight);
-        Make(subInstruction, fctx, ictx, stringChunks, afterLeft, beforeRight);
-        instr.AddSubInstruction(subInstruction);
-        i = beforeRight + 2;
+        FormulaElementType etype = RPNConsts.OperatorStrings[str];
+        elementList.Add(new ExecutionElement(etype));
+      }
+      else if (fctx.ContainsVariableName(str))
+      {
+        int varIndex = fctx.GetVariableIndex(str);
+        int registerPlace = resultExecution.AddVarBinding(varIndex);
+        FormulaElementType elType = Formula.RegisterFromInt(registerPlace);
+        elementList.Add(new ExecutionElement(elType));
+      }
+      else if (ictx.ContainsVerbName(str))
+      {
+        elementList.Add(new ExecutionElement(str));
       }
       else
       {
-        //instr.AddFormula(FormulaFactory.Make(fctx, stringChunks, i));
+        int number = 0;
+        bool success = int.TryParse(str, out number);
+        if (success)
+        {
+          elementList.Add(new ExecutionElement(number));
+        }
+        else
+        {
+          throw new Exception("What is this, " + str);
+        }
       }
     }
+
+    resultExecution.AddElementList(elementList);
+    if (resultExecution.IsMismatched())
+    {
+      throw new Exception("Mismatched, " + resultExecution.ToLongString(fctx, ictx));
+    }
+    return resultExecution;
   }
 
   public static void FindGuts(List<string> stringChunks, int startIdx, out int afterLeft, out int beforeRight)
