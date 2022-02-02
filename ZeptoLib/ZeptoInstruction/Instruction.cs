@@ -6,18 +6,26 @@ public class Instruction
     public Condition condition;
     public Expression? expression = null;
 
+    public String source;
 
-    public Instruction(int depth)
+
+    public Instruction(int depth, string line)
     {
         this.condition = Condition.NONE;
         this.depth = depth;
+        this.source = line;
     }
 
-    public bool IsConditional()
+    public bool IsIfConditional()
     {
-        return condition == Condition.IF || condition == Condition.ELSEIF || condition == Condition.ELSE;
+        return condition == Condition.IF || condition == Condition.ELSEIF;
     }
 
+
+    public bool IsElseConditional()
+    {
+        return condition == Condition.ELSEIF || condition == Condition.ELSE;
+    }
 
     public string ToLongString()
     {
@@ -32,9 +40,14 @@ public class Instruction
         }
         if (expression != null)
         {
-            sb.Append(" exec:");
+            sb.Append(" expr:");
             sb.Append(expression?.ToString() ?? "");
         }
         return sb.ToString();
+    }
+
+    public string ToSourceString()
+    {
+        return source;
     }
 }

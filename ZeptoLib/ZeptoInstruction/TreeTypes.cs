@@ -29,10 +29,19 @@ public class TreeNode
         this.payload = payload;
     }
 
-
-    public bool IsConditional()
+    public bool IsIfConditional()
     {
-        return payload != null && payload.IsConditional();
+        return payload != null && payload.IsIfConditional();
     }
 
-}
+    public bool IsElseConditional()
+    {
+        return payload != null && payload.IsElseConditional();
+    }
+    
+    public override string ToString()
+    {
+        return "@"+payload?.ToSourceString();
+    }
+
+}   

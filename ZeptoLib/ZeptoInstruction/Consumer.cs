@@ -1,3 +1,5 @@
+//#define CONSOLE_DEBUG_MAKE
+//#define CONSOLE_DEBUG_EXEC
 
 using ZeptoFormula;
 using ZeptoCommon;
@@ -5,10 +7,6 @@ using ZeptoBehave;
 
 namespace ZeptoInstruction;
 
-public class ZeptoInstructionNode
-{
-
-}
 
 public class Consumer
 {
@@ -43,26 +41,35 @@ public class Consumer
     public void MakeTree(in List<Instruction> instrList)
     {
         root = new TreeNode(null, null);
-        AppendTree(instrList, new ChunkSpan(0, instrList.Count), root);
+        ChunkSpan span = new ChunkSpan(0, instrList.Count - 1);
+#if CONSOLE_DEBUG_MAKE
+        for (int i = span.start; i <= span.end; ++i)
+        {
+            Instruction instr = instrList[i];
+            Console.WriteLine("[" + i + "] D:" + instr.depth + " " + instr.ToSourceString());
+        }
+#endif
+        AppendTree(instrList, span, 0, root);
     }
 
-    public void AppendTree(in List<Instruction> instrList, ChunkSpan span, TreeNode parent)
+    public void AppendTree(in List<Instruction> instrList, ChunkSpan span, int curDepth, TreeNode parent)
     {
-        if (span.start == span.end)
+        if (span.start > span.end)
         {
             return;
         }
 
-        int first = span.start;
-        int listDepth = instrList[first].depth;
-
         TreeNode? prev = null;
-        for (int i = span.start; i < span.end; ++i)
+        for (int idxInstruction = span.start; idxInstruction <= span.end; ++idxInstruction)
         {
-            Instruction instr = instrList[i];
-            if (instr.depth == listDepth)
+            Instruction instr = instrList[idxInstruction];
+            if (instr.depth == curDepth)
             {
                 TreeNode node = new TreeNode(parent, instr);
+
+#if CONSOLE_DEBUG_MAKE
+                Console.WriteLine("[" + idxInstruction + "] to " + parent.ToString());
+#endif
                 if (parent.children == null)
                 {
                     parent.children = new List<TreeNode>();
@@ -70,41 +77,50 @@ public class Consumer
                 parent.children.Add(node);
                 prev = node;
             }
-            else if (prev != null && instr.depth > listDepth)
+            else if (prev != null && instr.depth > curDepth)
             {
-                int innerSpanStart = i;
-                int innerSpanEnd = i;
-                for (int j = i; j < span.end; ++j)
+                int innerSpanStart = idxInstruction;
+                int innerSpanEnd = idxInstruction;
+                for (int idxInner = idxInstruction; idxInner < span.end; ++idxInner)
                 {
-                    if (instrList[j].depth <= listDepth)
+                    if (instrList[idxInner].depth <= curDepth)
                     {
-                        innerSpanEnd = j - 1;
+                        innerSpanEnd = idxInner - 1;
+                        //idxInstruction should be idxInner next step but it will be incremented by for loop
+                        idxInstruction = idxInner - 1;
+                        break;
                     }
                 }
-                AppendTree(instrList, new ChunkSpan(innerSpanStart, innerSpanEnd), prev);
+                ChunkSpan nextSpan = new ChunkSpan(innerSpanStart, innerSpanEnd);
+#if CONSOLE_DEBUG_MAKE
+                Console.WriteLine(prev + " nextSpan" + nextSpan + " at D:" + instr.depth);
+#endif
+                AppendTree(instrList, nextSpan, instr.depth, prev);
+
             }
-            else if (instr.depth < listDepth)
+            else if (instr.depth < curDepth)
             {
                 break;
             }
         }
     }
 
-    public void ConsumeRoot()
+    public void ConsumeStart()
     {
         if (root == null)
         {
             return;
         }
         bool skipConditional;
+
         ConsumeNode(root, out skipConditional);
     }
 
 
 
-    public void ConsumeNode(TreeNode current, out bool parentShouldSkip)
+    public void ConsumeNode(TreeNode current, out bool drilledIn)
     {
-        parentShouldSkip = false;
+        drilledIn = false;
         Instruction? instr = current.payload;
         bool doChildren = current.children != null;
         if (instr != null)
@@ -113,36 +129,54 @@ public class Consumer
             if (expr != null)
             {
                 int val = expr.Calculate(ctx, ctx);
-                if (instr.condition == Condition.IF || instr.condition == Condition.ELSEIF)
+#if CONSOLE_DEBUG_EXEC
+                Console.WriteLine(val + " = " + current.ToString() + (current.children != null ? " ~" + current.children.Count : "."));
+#endif                
+                if (instr.IsIfConditional())
                 {
                     doChildren = current.children != null && val > 0;
-                    parentShouldSkip = true;
+                    drilledIn = true;
                 }
 
             }
         }
+        else
+        {
+#if CONSOLE_DEBUG_EXEC
+            Console.WriteLine(current.ToString() + (current.children != null ? " ~" + current.children.Count : "."));
+#endif                  
+        }
+
         if (doChildren && current.children != null)
         {
-            bool skipConditional = false;
+            bool skipElse = false;
             for (int i = 0; i < current.children.Count; ++i)
             {
                 bool skip = false;
-                if (skipConditional)
+                if (skipElse)
                 {
-                    if (current.children[i].IsConditional())
+                    if (current.children[i].IsElseConditional())
                     {
                         skip = true;
                     }
                     else
                     {
-                        skipConditional = false;
+                        skipElse = false;
                     }
                 }
+
+
                 if (!skip)
                 {
-                    bool childWantsSkip;
-                    ConsumeNode(current.children[i], out childWantsSkip);
-                    skipConditional = childWantsSkip;
+                    bool childDrilledIn;
+                    ConsumeNode(current.children[i], out childDrilledIn);
+                    skipElse = childDrilledIn;
+                }
+                else
+                {
+#if CONSOLE_DEBUG_EXEC
+                    Console.WriteLine("Skip:" + current.children[i].ToString());
+#endif                    
                 }
             }
         }

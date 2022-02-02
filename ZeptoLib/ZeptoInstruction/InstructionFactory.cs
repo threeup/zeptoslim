@@ -40,7 +40,7 @@ public static class InstructionFactory
         int depth;
         string line = Parser.Sanitize(contents[i], out depth);
         Parser.StringIntoChunks(line, ref buffer);
-        Instruction instr = new Instruction(depth);
+        Instruction instr = new Instruction(depth, line);
         InstructionFactory.Make(instr, fctx, ctx, buffer);
         list.Add(instr);
       }
