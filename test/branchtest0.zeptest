@@ -1,0 +1,15 @@
+#VAR
+HP
+
+#PREP
+HP=1
+
+#BODY
+if 0
+    HP=2
+if 1
+    HP+=4
+HP-=1
+
+#ANSWERS
+4

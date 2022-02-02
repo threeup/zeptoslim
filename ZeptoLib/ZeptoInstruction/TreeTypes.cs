@@ -15,6 +15,19 @@ public struct ChunkSpan
     }
 }
 
+public class ZeptoTest
+{
+    public string[]? varContents = null;
+    public string[]? methodContents = null;
+    public string[]? prepContents = null;
+    public string[]? bodyContents = null;
+    public int[]? answers = null;
+
+    public ZeptoTest()
+    {
+    }
+}
+
 
 public class TreeNode
 {

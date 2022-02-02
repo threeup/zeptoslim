@@ -1,0 +1,21 @@
+#VAR
+HP, ENERGY
+
+#METHOD
+
+#PREP
+HP=1
+ENERGY=0
+
+#BODY
+if 1
+    HP=5
+    ENERGY+=1
+    ENERGY+=1
+    ENERGY+=1
+else
+    HP=2
+ENERGY+=3
+
+#ANSWERS
+5,6

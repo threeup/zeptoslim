@@ -7,16 +7,29 @@ using ZeptoBehave;
 
 namespace ZeptoInstruction;
 
-
 public class Consumer
 {
     public Context ctx = new Context();
     private TreeNode? root = null;
-    public void SetContext(string varContents, string verbContents)
+    public void SetContext(string[]? varContents, string[]? verbContents)
     {
-        List<string> varChunks = Parser.CommaSeparatedIntoChunks(varContents);
+        List<string> varChunks = new List<string>();
+        if(varContents != null)
+        {
+            for(int i=0; i<varContents.Length; ++i)
+            {
+                varChunks.AddRange(Parser.CommaSeparatedIntoChunks(varContents[i]));
+            }
+        }
         ctx.AddVariableNameList(varChunks);
-        List<string> verbChunks = Parser.CommaSeparatedIntoChunks(verbContents);
+        List<string> verbChunks = new List<string>();
+        if(verbContents != null)
+        {
+            for(int i=0; i<verbContents.Length; ++i)
+            {
+                verbChunks.AddRange(Parser.CommaSeparatedIntoChunks(verbContents[i]));
+            }
+        }
         ctx.AddMethodNameList(verbChunks);
     }
     public void ConsumeFormulaList(string[] formulaList)
