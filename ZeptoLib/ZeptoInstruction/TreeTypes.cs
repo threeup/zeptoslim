@@ -18,9 +18,12 @@ public struct ChunkSpan
 public class ZeptoTest
 {
     public string[]? varContents = null;
+    public string[]? varNames = null;
     public string[]? methodContents = null;
+    public string[]? methodNames = null;
     public string[]? prepContents = null;
     public string[]? bodyContents = null;
+    public string[]? answerContents = null;
     public int[]? answers = null;
 
     public ZeptoTest()
@@ -31,15 +34,21 @@ public class ZeptoTest
 
 public class TreeNode
 {
+    public static int NodeID = 100;
+    public static int GetNextNode() { return NodeID++; }
+    public int id;
     public TreeNode? parent;
     public List<TreeNode>? children;
     public Instruction? payload;
+    public bool isDecider;
 
-    public TreeNode(TreeNode? parent, Instruction? payload)
+    public TreeNode(TreeNode? parent, Instruction? payload, bool isDecider)
     {
+        this.id = GetNextNode();
         this.parent = parent;
         children = null;
         this.payload = payload;
+        this.isDecider = isDecider;
     }
 
     public bool IsIfConditional()
@@ -51,10 +60,37 @@ public class TreeNode
     {
         return payload != null && payload.IsElseConditional();
     }
-    
-    public override string ToString()
+
+    public int Ancestry()
     {
-        return "@"+payload?.ToSourceString();
+        if (parent != null)
+        {
+            return 1 + parent.Ancestry();
+        }
+        return 1;
     }
 
-}   
+     public string ToAncestryString()
+    {
+        return new String(' ', Ancestry());
+    }
+
+    public string ToShortString(bool withAncestry)
+    {
+        if (withAncestry)
+        {
+            return ToAncestryString() + id.ToString();
+        }
+        return id.ToString();
+    }
+
+    public override string ToString()
+    {
+        if (isDecider)
+        {
+            return "<" + id + ">";
+        }
+        return "@" + id + " " + payload?.ToSourceString();
+    }
+
+}

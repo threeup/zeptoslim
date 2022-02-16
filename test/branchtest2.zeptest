@@ -1,0 +1,24 @@
+#VAR
+HP, ENERGY
+
+#METHOD
+
+#PREP
+HP=1
+ENERGY=0
+
+#BODY
+if 1
+    ENERGY+=3
+    if 0
+        HP=5
+    else
+        ENERGY+=2
+    ENERGY+=4
+    ENERGY+=1
+else
+    HP=2
+ENERGY-=8
+
+#ANSWERS
+1,2

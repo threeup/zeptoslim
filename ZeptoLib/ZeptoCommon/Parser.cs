@@ -60,6 +60,47 @@ namespace ZeptoCommon;
             return stringChunks;
         }
 
+        
+        public static List<int> CommaSeparatedIntoNumbers(string line)
+        {
+            List<int> numberChunks = new List<int>();
+            if (line.Length == 0)
+            {
+                return numberChunks;
+            }
+            string chunk = string.Empty;
+            char[] charArray = line.ToCharArray();
+            int cursorStart = 0;
+            int cursor = 0;
+            for (cursor = 0; cursor < charArray.Length; ++cursor)
+            {
+                char nextChar = charArray[cursor];
+                bool isComma = nextChar == ',';
+                bool isSpace = Char.IsWhiteSpace(nextChar);
+                if (isSpace || isComma)
+                {
+                    int chunkLength = cursor - cursorStart;
+                    if(chunkLength > 0)
+                    {
+                        chunk = line.Substring(cursorStart, chunkLength);
+                        numberChunks.Add(int.Parse(chunk));
+                    }
+                    cursorStart = cursor+1;
+                }
+                else if (!Char.IsDigit(nextChar) && !Char.IsSymbol(nextChar))
+                {
+                    throw new Exception("Expected commas spaces alpha numeric "+line);
+                }
+            }
+            chunk = line.Substring(cursorStart, cursor - cursorStart).Trim();
+            if (!string.IsNullOrEmpty(chunk))
+            {
+                numberChunks.Add(int.Parse(chunk));
+            }
+            
+            return numberChunks;
+        }
+
         public static void StringIntoChunks(string line, ref List<string> stringChunks)
         {
             stringChunks.Clear();

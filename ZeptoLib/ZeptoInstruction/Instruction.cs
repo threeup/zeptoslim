@@ -16,6 +16,11 @@ public class Instruction
         this.source = line;
     }
 
+
+    public bool IsConditional()
+    {
+        return condition == Condition.IF || condition == Condition.ELSEIF || condition == Condition.ELSE;
+    }
     public bool IsIfConditional()
     {
         return condition == Condition.IF || condition == Condition.ELSEIF;

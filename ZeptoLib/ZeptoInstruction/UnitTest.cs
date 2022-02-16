@@ -2,6 +2,7 @@
 
 using ZeptoFormula;
 using ZeptoBehave;
+using ZeptoCommon;
 
 namespace ZeptoInstruction;
 
@@ -9,12 +10,13 @@ public static class UnitTest
 {
     public static void Run()
     {
-        FlatTestZero();
-        FlatTestOne();
-        FlatTestTwo();
-        FlatTestThree();
-        RunZeptoTest("test\\branchtest0.zeptest");
-        RunZeptoTest("test\\branchtest1.zeptest");
+        // FlatTestZero();
+        // FlatTestOne();
+        // FlatTestTwo();
+        // FlatTestThree();
+        // RunZeptoTest("test\\branchtest0.zeptest");
+        // RunZeptoTest("test\\branchtest1.zeptest");
+        RunZeptoTest("test\\branchtest2.zeptest");
         Console.WriteLine("Instruction Test Passed");
     }
 
@@ -27,8 +29,8 @@ public static class UnitTest
         int[] answers = new int[] { 4 };
 
         IInstructionContext ictx = InstructionFactory.MakeContext(varContents, methodContents, prepContents);
-        List<Instruction> instrList = new List<Instruction>();
-        List<string> buffer = new List<string>();
+        List<Instruction> instrList = new();
+        List<string> buffer = new();
         InstructionFactory.MakeList(ictx, bodyContents, ref instrList, ref buffer);
         CheckAnswers(ictx, ref instrList, ref answers);
 
@@ -43,8 +45,8 @@ public static class UnitTest
 
         IInstructionContext ictx = InstructionFactory.MakeContext(varContents, methodContents, prepContents);
         ictx.SetMethodPtr("explode", Context.Double);
-        List<Instruction> instrList = new List<Instruction>();
-        List<string> buffer = new List<string>();
+        List<Instruction> instrList = new();
+        List<string> buffer = new();
         InstructionFactory.MakeList(ictx, bodyContents, ref instrList, ref buffer);
         CheckAnswers(ictx, ref instrList, ref answers);
 
@@ -60,8 +62,8 @@ public static class UnitTest
 
         IInstructionContext ictx = InstructionFactory.MakeContext(varContents, methodContents, prepContents);
 
-        List<Instruction> instrList = new List<Instruction>();
-        List<string> buffer = new List<string>();
+        List<Instruction> instrList = new();
+        List<string> buffer = new();
         InstructionFactory.MakeList(ictx, bodyContents, ref instrList, ref buffer);
 
         CheckAnswers(ictx, ref instrList, ref answers);
@@ -77,8 +79,8 @@ public static class UnitTest
 
         IInstructionContext ictx = InstructionFactory.MakeContext(varContents, methodContents, prepContents);
         ictx.SetMethodPtr("explode", Context.Double);
-        List<Instruction> instrList = new List<Instruction>();
-        List<string> buffer = new List<string>();
+        List<Instruction> instrList = new();
+        List<string> buffer = new();
         InstructionFactory.MakeList(ictx, bodyContents, ref instrList, ref buffer);
         CheckAnswers(ictx, ref instrList, ref answers);
     }
@@ -90,14 +92,14 @@ public static class UnitTest
 
         ZeptoTest zt = ParseFile(filename);
 
-        Consumer c = new Consumer();
-        c.SetContext(zt.varContents, zt.methodContents);
+        Consumer c = new();
+        c.SetContext(zt.varNames, zt.methodNames);
         if (zt.prepContents != null)
         {
             c.ConsumeFormulaList(zt.prepContents);
         }
-        List<Instruction> instrList = new List<Instruction>();
-        List<string> buffer = new List<string>();
+        List<Instruction> instrList = new();
+        List<string> buffer = new();
         if (zt.bodyContents != null)
         {
             InstructionFactory.MakeList(c.ctx, zt.bodyContents, ref instrList, ref buffer);
@@ -110,35 +112,65 @@ public static class UnitTest
         }
     }
 
+    private static void ParseFileAssign(ZeptoTest zt, string lastSection, ref List<string> buffer)
+    {
+        if (lastSection.StartsWith("#VAR"))
+        {
+            zt.varContents = buffer.ToArray();
+            List<string> varChunks = new();
+            for (int i = 0; i < buffer.Count; ++i)
+            {
+                varChunks.AddRange(Parser.CommaSeparatedIntoChunks(buffer[i]));
+            }
+            zt.varNames = varChunks.ToArray();
+        }
+        else if (lastSection.StartsWith("#METHOD"))
+        {
+            zt.methodContents = buffer.ToArray();
+            List<string> methodChunks = new();
+            for (int i = 0; i < buffer.Count; ++i)
+            {
+                methodChunks.AddRange(Parser.CommaSeparatedIntoChunks(buffer[i]));
+            }
+            zt.methodNames = methodChunks.ToArray();
+        }
+        else if (lastSection.StartsWith("#PREP"))
+        {
+            zt.prepContents = buffer.ToArray();
+        }
+        else if (lastSection.StartsWith("#BODY"))
+        {
+            zt.bodyContents = buffer.ToArray();
+        }
+        else if (lastSection.StartsWith("#ANSWERS"))
+        {
+            zt.answerContents= buffer.ToArray();
+            List<int> answerChunks = new();
+            for (int i = 0; i < buffer.Count; ++i)
+            {
+                answerChunks.AddRange(Parser.CommaSeparatedIntoNumbers(buffer[i]));
+            }
+            zt.answers= answerChunks.ToArray();;
+        }
+    }
+
     public static ZeptoTest ParseFile(string testPath)
     {
         ZeptoTest zt = new ZeptoTest();
         using (StreamReader file = new StreamReader(testPath))
         {
-            List<string> buffer = new List<string>();
+            List<string> buffer = new();
             string section = "";
             string? curLine;
             while (file != null && (curLine = file.ReadLine()) != null)
             {
                 if (curLine.StartsWith('#'))
                 {
-                    if (section.StartsWith("#VAR"))
+                    if(buffer.Count > 0)
                     {
-                        zt.varContents = buffer.ToArray();
+                        ParseFileAssign(zt, section, ref buffer);
+                        buffer.Clear();
                     }
-                    else if (curLine.StartsWith("#METHOD"))
-                    {
-                        zt.methodContents = buffer.ToArray();
-                    }
-                    else if (curLine.StartsWith("#PREP"))
-                    {
-                        zt.prepContents = buffer.ToArray();
-                    }
-                    else if (curLine.StartsWith("#BODY"))
-                    {
-                        zt.bodyContents = buffer.ToArray();
-                    }
-                    buffer.Clear();
                     section = curLine;
                 }
                 else
@@ -146,6 +178,7 @@ public static class UnitTest
                     buffer.Add(curLine);
                 }
             }
+            ParseFileAssign(zt, section, ref buffer);
             if (file != null)
             {
                 file.Close();
