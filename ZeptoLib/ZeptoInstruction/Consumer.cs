@@ -113,8 +113,6 @@ public class Consumer
                     if (instrList[idxInner].depth < innerDepth)
                     {
                         innerSpanEnd = idxInner - 1;
-                        //idxInstruction should be idxInner next step but it will be incremented by for loop
-                        
                         break;
                     }
                 }
@@ -140,14 +138,10 @@ public class Consumer
     }
 
 
-
-    public bool ConsumeNode(TreeNode current)
+    public TreeNodeExecution ConsumeNode(TreeNode current)
     {
-#if CONSOLE_DEBUG_EXEC
-
-#endif
         Instruction? instr = current.payload;
-        bool result = false;
+        TreeNodeExecution result = TreeNodeExecution.NORMAL;
         int? val = null;
         if (instr != null)
         {
@@ -158,16 +152,12 @@ public class Consumer
             }
             if (instr.IsIfConditional())
             {
-                result = val != null && val > 0;
+                result = val != null && val > 0 ? TreeNodeExecution.CONDITION_PASS : TreeNodeExecution.CONDITION_FAIL;
             }
             else if (instr.IsElseConditional())
             {
-                result = true;
+                result = TreeNodeExecution.CONDITION_PASS;
             }
-        }
-        else
-        {
-            result = true;
         }
 #if CONSOLE_DEBUG_EXEC
         if (val != null)
@@ -180,21 +170,18 @@ public class Consumer
         }
 #endif      
 
-        if (result && current.children != null)
+        if (result != TreeNodeExecution.CONDITION_FAIL && current.children != null)
         {
             for (int i = 0; i < current.children.Count; ++i)
             {
-                bool childResult = ConsumeNode(current.children[i]);
-                if (current.isDecider)
+                TreeNodeExecution childResult = ConsumeNode(current.children[i]);
+                if (current.isDecider && childResult != TreeNodeExecution.CONDITION_FAIL)
                 {
-                    if (childResult)
+                    while (++i < current.children.Count)
                     {
-                        while (++i < current.children.Count)
-                        {
 #if CONSOLE_DEBUG_EXEC
-                            Console.WriteLine(current.children[i].ToAncestryString() + current.children[i].ToString() + " SKIP");
+                        Console.WriteLine(current.children[i].ToAncestryString() + current.children[i].ToString() + " SKIP");
 #endif
-                        }
                     }
                 }
             }

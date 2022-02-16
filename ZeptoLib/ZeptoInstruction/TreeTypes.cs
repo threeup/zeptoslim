@@ -28,7 +28,12 @@ public class ZeptoTest
     }
 }
 
-
+public enum TreeNodeExecution
+{
+  CONDITION_FAIL,
+  CONDITION_PASS,
+  NORMAL,
+}
 public class TreeNode
 {
     public static int NodeID = 100;
