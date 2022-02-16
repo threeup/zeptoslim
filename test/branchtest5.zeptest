@@ -17,16 +17,19 @@ if 1
         ENERGY+=2
         if 0
             HP=5
-        elseif 0
-            ENERGY+=12
-        elseif 1
-            ENERGY+=14
-        else 
-            ENERGY+=16
     ENERGY+=4
 else
     HP=2
-ENERGY-=8
+if 1
+    if 1
+        if 0
+            SP=2
+        else
+            SP=3
+    else
+        SP=4
+
+ENERGY-=1
 
 #ANSWERS
-1,15,0
+1,8,3

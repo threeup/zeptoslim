@@ -17,8 +17,9 @@ public static class UnitTest
         RunZeptoTest("test\\branchtest0.zeptest");
         RunZeptoTest("test\\branchtest1.zeptest");
         RunZeptoTest("test\\branchtest2.zeptest");
-        // RunZeptoTest("test\\branchtest3.zeptest");
-        // RunZeptoTest("test\\branchtest4.zeptest");
+        RunZeptoTest("test\\branchtest3.zeptest");
+        RunZeptoTest("test\\branchtest4.zeptest");
+        RunZeptoTest("test\\branchtest5.zeptest");
         Console.WriteLine("Instruction Test Passed");
     }
 
@@ -164,7 +165,11 @@ public static class UnitTest
             string? curLine;
             while (file != null && (curLine = file.ReadLine()) != null)
             {
-                if (curLine.StartsWith('#'))
+                if (curLine.StartsWith("//"))
+                {
+                    //nothing
+                }
+                else if (curLine.StartsWith('#'))
                 {
                     if(buffer.Count > 0)
                     {

@@ -87,7 +87,7 @@ public class Consumer
                     parent.children.Add(decider);
                     parent = decider;
                 }
-                if (!instr.IsConditional() && parent.isDecider && parent.parent != null)
+                else if (!instr.IsElseConditional() && parent.isDecider && parent.parent != null)
                 {
                     parent = parent.parent;
                 }
@@ -114,16 +114,17 @@ public class Consumer
                     {
                         innerSpanEnd = idxInner - 1;
                         //idxInstruction should be idxInner next step but it will be incremented by for loop
-                        idxInstruction = idxInner - 1;
+                        
                         break;
                     }
                 }
                 ChunkSpan nextSpan = new ChunkSpan(innerSpanStart, innerSpanEnd);
                 AppendTree(instrList, nextSpan, innerDepth, prev);
-
+                idxInstruction = innerSpanEnd;
             }
             else if (instr.depth < curDepth)
             {
+                //something wrong
                 break;
             }
         }
