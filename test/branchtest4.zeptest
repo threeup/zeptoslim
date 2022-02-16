@@ -1,0 +1,23 @@
+#VAR
+SP
+
+#METHOD
+
+#PREP
+SP=0
+
+#BODY
+
+if 1>0
+    if 2>0
+        if 3>0
+            if 4>5
+                SP=2
+            else
+                SP=3
+        else
+            SP=4
+
+
+#ANSWERS
+3

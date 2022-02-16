@@ -10,13 +10,15 @@ public static class UnitTest
 {
     public static void Run()
     {
-        // FlatTestZero();
-        // FlatTestOne();
-        // FlatTestTwo();
-        // FlatTestThree();
-        // RunZeptoTest("test\\branchtest0.zeptest");
-        // RunZeptoTest("test\\branchtest1.zeptest");
+        FlatTestZero();
+        FlatTestOne();
+        FlatTestTwo();
+        FlatTestThree();
+        RunZeptoTest("test\\branchtest0.zeptest");
+        RunZeptoTest("test\\branchtest1.zeptest");
         RunZeptoTest("test\\branchtest2.zeptest");
+        // RunZeptoTest("test\\branchtest3.zeptest");
+        // RunZeptoTest("test\\branchtest4.zeptest");
         Console.WriteLine("Instruction Test Passed");
     }
 
@@ -108,7 +110,8 @@ public static class UnitTest
         c.ConsumeStart();
         if (zt.answers != null)
         {
-            CheckContext(c.ctx, ref zt.answers);
+            bool success = CheckContext(c.ctx, ref zt.answers);
+            Console.WriteLine(success ? "Pass" : "Failed");
         }
     }
 
@@ -116,7 +119,6 @@ public static class UnitTest
     {
         if (lastSection.StartsWith("#VAR"))
         {
-            zt.varContents = buffer.ToArray();
             List<string> varChunks = new();
             for (int i = 0; i < buffer.Count; ++i)
             {
@@ -126,7 +128,6 @@ public static class UnitTest
         }
         else if (lastSection.StartsWith("#METHOD"))
         {
-            zt.methodContents = buffer.ToArray();
             List<string> methodChunks = new();
             for (int i = 0; i < buffer.Count; ++i)
             {
@@ -144,7 +145,6 @@ public static class UnitTest
         }
         else if (lastSection.StartsWith("#ANSWERS"))
         {
-            zt.answerContents= buffer.ToArray();
             List<int> answerChunks = new();
             for (int i = 0; i < buffer.Count; ++i)
             {
@@ -156,7 +156,7 @@ public static class UnitTest
 
     public static ZeptoTest ParseFile(string testPath)
     {
-        ZeptoTest zt = new ZeptoTest();
+        ZeptoTest zt = new();
         using (StreamReader file = new StreamReader(testPath))
         {
             List<string> buffer = new();
@@ -187,9 +187,10 @@ public static class UnitTest
         return zt;
     }
 
-    private static void CheckAnswers(IInstructionContext ictx, ref List<Instruction> instrList, ref int[] answers)
+    private static bool CheckAnswers(IInstructionContext ictx, ref List<Instruction> instrList, ref int[] answers)
     {
         IFormulaContext? fctx = ictx as IFormulaContext;
+        bool success = true;
         for (int i = 0; i < instrList.Count; ++i)
         {
             Expression? ex = instrList[i].expression;
@@ -200,14 +201,17 @@ public static class UnitTest
                 {
                     //throw new Exception("Test fail " + val + " Expected:" + answers[i]);
                     Console.WriteLine("Test fail " + val + " Expected:" + answers[i]);
+                    success = false;
                 }
             }
         }
+        return success;
     }
 
-    private static void CheckContext(IInstructionContext ictx, ref int[] answers)
+    private static bool CheckContext(IInstructionContext ictx, ref int[] answers)
     {
         IFormulaContext? fctx = ictx as IFormulaContext;
+        bool success = true;
         for (int i = 0; i < answers.Length; ++i)
         {
             if (fctx != null)
@@ -217,9 +221,12 @@ public static class UnitTest
                 {
                     //throw new Exception("Test fail " + val + " Expected:" + answers[i]);
                     Console.WriteLine("Test fail " + val + " Expected:" + answers[i]);
+                    success = false;
                 }
             }
         }
+        return success;
+        
 
     }
 }

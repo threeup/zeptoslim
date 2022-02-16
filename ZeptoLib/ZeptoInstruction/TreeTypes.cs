@@ -17,13 +17,10 @@ public struct ChunkSpan
 
 public class ZeptoTest
 {
-    public string[]? varContents = null;
     public string[]? varNames = null;
-    public string[]? methodContents = null;
     public string[]? methodNames = null;
     public string[]? prepContents = null;
     public string[]? bodyContents = null;
-    public string[]? answerContents = null;
     public int[]? answers = null;
 
     public ZeptoTest()

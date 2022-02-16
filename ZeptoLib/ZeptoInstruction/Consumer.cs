@@ -1,5 +1,5 @@
-//#define CONSOLE_DEBUG_MAKE
-//#define CONSOLE_DEBUG_EXEC
+// #define CONSOLE_DEBUG_MAKE
+// #define CONSOLE_DEBUG_EXEC
 
 using ZeptoFormula;
 using ZeptoCommon;
@@ -49,6 +49,13 @@ public class Consumer
     {
         root = new TreeNode(null, null, false);
         ChunkSpan span = new ChunkSpan(0, instrList.Count - 1);
+#if CONSOLE_DEBUG_MAKE
+        for (int i = span.start; i <= span.end; ++i)
+        {
+            Instruction instr = instrList[i];
+            Console.WriteLine("[" + i + "] D:" + instr.depth + " " + instr.ToSourceString());
+        }
+#endif
         AppendTree(instrList, span, 0, root);
     }
 
@@ -58,7 +65,9 @@ public class Consumer
         {
             return;
         }
-
+#if CONSOLE_DEBUG_MAKE
+        Console.WriteLine(curDepth+" ->"+span.ToString());
+#endif
         TreeNode? prev = null;
         for (int idxInstruction = span.start; idxInstruction <= span.end; ++idxInstruction)
         {
@@ -97,10 +106,11 @@ public class Consumer
             else if (prev != null && instr.depth > curDepth)
             {
                 int innerSpanStart = idxInstruction;
-                int innerSpanEnd = idxInstruction;
-                for (int idxInner = idxInstruction; idxInner < span.end; ++idxInner)
+                int innerSpanEnd = span.end;
+                int innerDepth = instr.depth;
+                for (int idxInner = idxInstruction; idxInner <= span.end; ++idxInner)
                 {
-                    if (instrList[idxInner].depth <= curDepth)
+                    if (instrList[idxInner].depth < innerDepth)
                     {
                         innerSpanEnd = idxInner - 1;
                         //idxInstruction should be idxInner next step but it will be incremented by for loop
@@ -109,7 +119,7 @@ public class Consumer
                     }
                 }
                 ChunkSpan nextSpan = new ChunkSpan(innerSpanStart, innerSpanEnd);
-                AppendTree(instrList, nextSpan, instr.depth, prev);
+                AppendTree(instrList, nextSpan, innerDepth, prev);
 
             }
             else if (instr.depth < curDepth)
